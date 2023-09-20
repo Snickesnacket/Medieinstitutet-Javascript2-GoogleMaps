@@ -75,6 +75,28 @@ const AddRestaurantForm: React.FC<IProps> = ({ onAddRestaurant }) => {
       </Form.Group>
 
       <Form.Group>
+        <Form.Label>Latitud</Form.Label>
+        <Form.Control
+          type="text"
+          {...register("Latitude", { required: "obligatosikt" })}
+        />
+        {errors.Latitude && (
+          <p className="invalid">{errors.Latitude.message}</p>
+        )}
+      </Form.Group>
+
+      <Form.Group>
+        <Form.Label>Longitude</Form.Label>
+        <Form.Control
+          type="text"
+          {...register("Longitude", { required: "obligatosikt" })}
+        />
+        {errors.Longitude && (
+          <p className="invalid">{errors.Longitude.message}</p>
+        )}
+      </Form.Group>
+
+      <Form.Group>
         <Form.Label>Kategori</Form.Label>
         <Form.Control
           type="text"
