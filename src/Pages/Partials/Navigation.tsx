@@ -28,6 +28,10 @@ function Navigation() {
             <Nav.Link as={NavLink} to="/tips">
               TIPS
             </Nav.Link>
+
+            <Nav.Link as={NavLink} to="/Loggin">
+              LOGGA IN
+            </Nav.Link>
           </Nav>
         </Navbar.Collapse>
       </Container>

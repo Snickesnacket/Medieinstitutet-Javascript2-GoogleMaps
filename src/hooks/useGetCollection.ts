@@ -8,7 +8,7 @@ const useGetCollection = <T>(colRef: CollectionReference<T>) => {
   const getData = useCallback(async () => {
     setLoading(true);
 
-    const snapshot = await getDocs(colRef);
+    const snapshot = await getDocs(colRef); // where här
 
     const data: T[] = snapshot.docs.map((doc) => {
       return {

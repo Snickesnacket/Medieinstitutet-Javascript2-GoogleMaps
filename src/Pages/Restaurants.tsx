@@ -19,7 +19,7 @@ const Restaurants = () => {
               key={restaurant._id}
               to={`/restaurants/${restaurant._id}`}
             >
-              <h2 className="name"> {restaurant.Namn}</h2>
+              <h2 className="name">Namn: {restaurant.Namn}</h2>
               <p className="gatuadress">Gatuadress: {restaurant.Gatuadress}</p>
               <p className="ort">Ort: {restaurant.Ort}</p>
               <p className="beskrivning">

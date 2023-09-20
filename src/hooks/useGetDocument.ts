@@ -1,4 +1,4 @@
-import { useCallback, useState, useEffect } from "react";
+/* import { useCallback, useState, useEffect } from "react";
 import { getDoc, CollectionReference, doc } from "firebase/firestore";
 
 const useGetDocument = <T>(
@@ -45,3 +45,4 @@ const useGetDocument = <T>(
 };
 
 export default useGetDocument;
+ */

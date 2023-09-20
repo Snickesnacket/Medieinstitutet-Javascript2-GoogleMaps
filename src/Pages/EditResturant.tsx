@@ -1,4 +1,4 @@
-import { doc, updateDoc } from "firebase/firestore";
+import { doc, updateDoc, deleteDoc } from "firebase/firestore";
 import Button from "react-bootstrap/Button";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -34,6 +34,19 @@ const EditRestaurant = () => {
         error: "Something went wrong while saving the changes",
       }
     );
+    navigate("/restaurants");
+  };
+
+  const deleteRestaurant = async () => {
+    const docRef = doc(restuantCol, documentId);
+
+    await deleteDoc(docRef);
+
+    toast.success("deleted!");
+
+    navigate("/restaurants", {
+      replace: true,
+    });
   };
 
   return (
@@ -41,6 +54,10 @@ const EditRestaurant = () => {
       <h1>Edit: {data.Namn}</h1>
 
       <RestaurantForm onSave={updateRestaurant} initialValues={data} />
+
+      <Button variant="warning" onClick={() => deleteRestaurant()}>
+        Delete
+      </Button>
 
       <Button variant="secondary" onClick={() => navigate(-1)}>
         &laquo; Go back

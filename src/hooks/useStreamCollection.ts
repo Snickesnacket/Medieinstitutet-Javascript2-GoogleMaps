@@ -1,13 +1,21 @@
-import { CollectionReference, onSnapshot } from "firebase/firestore";
+import {
+  CollectionReference,
+  QueryConstraint,
+  onSnapshot,
+  query,
+} from "firebase/firestore";
 import { useEffect, useState } from "react";
 
-const useStreamCollection = <T>(colRef: CollectionReference<T>) => {
+const useStreamCollection = <T>(
+  colRef: CollectionReference<T>,
+  ...queryConstraints: QueryConstraint[]
+) => {
   const [data, setData] = useState<T[] | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onSnapshot(colRef, (snapshot) => {
-      console.log("Got me some data 🤑");
+    const queryRef = query(colRef, ...queryConstraints);
+    const unsubscribe = onSnapshot(queryRef, (snapshot) => {
       const data: T[] = snapshot.docs.map((doc) => {
         return {
           ...doc.data(),
@@ -20,7 +28,7 @@ const useStreamCollection = <T>(colRef: CollectionReference<T>) => {
     });
 
     return unsubscribe;
-  }, [colRef]);
+  }, [colRef, queryConstraints]);
 
   return {
     data,

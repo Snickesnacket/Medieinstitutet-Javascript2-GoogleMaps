@@ -6,8 +6,7 @@ import HomePage from "./Pages/HomePage";
 import EditRestaurant from "./Pages/EditResturant";
 import Restaurants from "./Pages/Restaurants";
 import Navigation from "./Pages/Partials/Navigation";
-import Restaurant from "./Pages/Restaurant";
-
+import LoggInPage from "./Pages/LoggInPage";
 
 function App() {
   return (
@@ -19,9 +18,9 @@ function App() {
           <Route path="/Create" element={<CreateRestaurant />}></Route>
           <Route path="/Restaurants">
             <Route path="" element={<Restaurants />} />
-            <Route path=":id" element={<Restaurant />} />
-            <Route path=":id/edit" element={<EditRestaurant />} />
+            <Route path=":id" element={<EditRestaurant />} />
           </Route>
+          <Route path="/Loggin" element={<LoggInPage />} />
         </Routes>
       </Container>
     </div>
