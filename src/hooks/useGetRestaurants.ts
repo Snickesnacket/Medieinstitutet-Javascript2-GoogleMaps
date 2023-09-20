@@ -4,7 +4,7 @@ import { Restaurant } from "../types/Restaurant.types";
 import useStreamCollection from "./useStreamCollection";
 
 const useRestaurants = () => {
-  return useStreamCollection<Restaurant>(restuantCol, orderBy("name"));
+  return useStreamCollection<Restaurant>(restuantCol, orderBy("Namn"));
 };
 
 export default useRestaurants;

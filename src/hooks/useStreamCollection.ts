@@ -28,7 +28,7 @@ const useStreamCollection = <T>(
     });
 
     return unsubscribe;
-  }, [colRef, queryConstraints]);
+  }, [colRef]);
 
   return {
     data,
