@@ -8,9 +8,14 @@ import { useState } from "react";
 import "../assets/scss/App.scss";
 import useRestaurants from "../hooks/useGetRestaurants";
 
+
 interface InfoWindowData {
   id: number;
+  Namn: string;
   Gatuadress: string;
+  Ort: string;
+  Kategori: string;
+  Utbud: string;
   lat: number;
   lng: number;
 }
@@ -48,10 +53,14 @@ export const HomePage = () => {
     id: number,
     lat: number,
     lng: number,
-    Gatuadress: string
+    Namn: string,
+    Gatuadress: string,
+    Ort: string,
+    Kategori: string,
+    Utbud: string
   ) => {
     mapRef?.panTo({ lat, lng });
-    setInfoWindowData({ id, Gatuadress, lat, lng });
+    setInfoWindowData({ id, Namn, Ort, Gatuadress, Kategori, Utbud, lat, lng });
     setIsOpen(true);
   };
 
@@ -67,14 +76,31 @@ export const HomePage = () => {
         >
           {data.map(
             (
-              { Gatuadress: Gatuadress, Latitude: lat, Longitude: lng },
+              {
+                Gatuadress,
+                Latitude: lat,
+                Longitude: lng,
+                Namn,
+                Ort,
+                Kategori,
+                Utbud,
+              },
               ind
             ) => (
               <MarkerF
                 key={ind}
                 position={{ lat, lng }}
                 onClick={() => {
-                  handleMarkerClick(ind, lat, lng, Gatuadress);
+                  handleMarkerClick(
+                    ind,
+                    lat,
+                    lng,
+                    Namn,
+                    Gatuadress,
+                    Ort,
+                    Kategori,
+                    Utbud
+                  );
                 }}
               >
                 {isOpen && infoWindowData?.id === ind && (
@@ -83,7 +109,11 @@ export const HomePage = () => {
                       setIsOpen(false);
                     }}
                   >
-                    <h3>{infoWindowData.Gatuadress}</h3>
+                    <>
+                      <h3>{infoWindowData.Namn}</h3>
+                      <p>{infoWindowData.Gatuadress}</p>
+                      <p>{infoWindowData.Ort}</p>
+                    </>
                   </InfoWindow>
                 )}
               </MarkerF>
