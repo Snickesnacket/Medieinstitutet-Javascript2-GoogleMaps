@@ -30,5 +30,5 @@ const createCollection = <T = DocumentData>(collectionName: string) => {
 export const restuantCol = createCollection<Restaurant>("restaurants");
 export const newRestaurantCol = createCollection<NewRestaurant>("restaurants");
 export const tipsCol = createCollection<Tip>("Tips");
-
+export const newTipCol = createCollection<NewTip>("Tips");
 export default app;

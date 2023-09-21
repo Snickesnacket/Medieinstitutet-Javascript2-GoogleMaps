@@ -17,7 +17,9 @@ type AuthContextType = {
   login: (email: string, password: string) => Promise<UserCredential>;
   logout: () => Promise<void>;
   reloadUser: () => Promise<boolean>;
+  setEmail: (email: string) => Promise<void>;
   setDisplayName: (displayName: string) => Promise<void>;
+  setPassword: (password: string) => Promise<void>;
   setPhotoUrl: (photoURL: string) => Promise<void>;
   userEmail: string | null;
   userName: string | null;

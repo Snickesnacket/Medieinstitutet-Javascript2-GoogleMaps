@@ -3,3 +3,8 @@ export interface Tip {
   email: string;
   Tips: string;
 }
+
+export interface NewTip {
+  email: string;
+  Tips: string;
+}

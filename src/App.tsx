@@ -9,6 +9,7 @@ import Navigation from "./Pages/Partials/Navigation";
 import LoggaInPage from "./Pages/LoggaInPage";
 import LoggaUtPage from "./Pages/LoggaUtPage";
 import TipsPageAdmin from "./Pages/TipsPageAdmin";
+import { CreateTip } from "./Pages/CreateTip";
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
           </Route>
           <Route path="/Loggain" element={<LoggaInPage />} />
           <Route path="/Loggaut" element={<LoggaUtPage />} />
+          <Route path="/CreateTip" element={<CreateTip />} />
         </Routes>
       </Container>
     </div>

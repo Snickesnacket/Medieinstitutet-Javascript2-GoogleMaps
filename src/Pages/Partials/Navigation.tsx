@@ -49,7 +49,7 @@ function Navigation() {
                     TIPS
                   </NavDropdown.Item>
                   <NavDropdown.Item as={NavLink} to="/Loggaut">
-                    Logout
+                    LOGGA UT
                   </NavDropdown.Item>
                 </NavDropdown>
               </>
@@ -57,8 +57,11 @@ function Navigation() {
               <>
                 <Nav.Link as={NavLink} to="/Loggain">
                   {" "}
-                  {/* Typo correction */}
                   LOGGA IN
+                </Nav.Link>
+                <Nav.Link as={NavLink} to="/CreateTip">
+                  {" "}
+                  SKRIV TIPS
                 </Nav.Link>
               </>
             )}
