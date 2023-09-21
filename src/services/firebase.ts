@@ -7,7 +7,7 @@ import {
   getFirestore,
 } from "firebase/firestore";
 import { NewRestaurant, Restaurant } from "../types/Restaurant.types";
-import { Tip } from "../types/Tips.types";
+import { NewTip, Tip } from "../types/Tips.types";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
