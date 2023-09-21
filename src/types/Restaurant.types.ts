@@ -1,7 +1,7 @@
 export interface Restaurant {
   _id: string;
   Namn: string;
-  Gatuadress: string | number;
+  Gatuadress: string;
   Ort: string;
   Latitude: number;
   Longitude: number;
@@ -17,7 +17,7 @@ export interface Restaurant {
 
 export interface RestaurantFormData {
   Namn: string;
-  Gatuadress: string | number;
+  Gatuadress: string;
   Ort: string;
   Latitude: number;
   Longitude: number;

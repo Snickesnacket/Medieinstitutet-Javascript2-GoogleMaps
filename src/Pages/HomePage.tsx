@@ -6,19 +6,16 @@ import {
 } from "@react-google-maps/api";
 import { useState } from "react";
 import "../assets/scss/App.scss";
+import useRestaurants from "../hooks/useGetRestaurants";
 
-interface MarkerData {
-  address: string;
+interface InfoWindowData {
+  id: number;
+  Gatuadress: string;
   lat: number;
   lng: number;
 }
 
-interface InfoWindowData {
-  id: number;
-  address: string;
-}
-
-const HomePage: React.FC = () => {
+export const HomePage = () => {
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: String(import.meta.env.VITE_FIREBASE_GOOGLE_API_KEY),
   });
@@ -28,16 +25,22 @@ const HomePage: React.FC = () => {
     InfoWindowData | undefined
   >();
 
-  const markers: MarkerData[] = [
-    { address: "Address1", lat: 18.5204, lng: 73.8567 },
-    { address: "Address2", lat: 18.5314, lng: 73.8446 },
-    { address: "Address3", lat: 18.5642, lng: 73.7769 },
-  ];
+  const { data } = useRestaurants();
+  console.log(data);
+
+  if (!data) {
+    return console.log("error");
+  }
 
   const onMapLoad = (map: google.maps.Map) => {
     setMapRef(map);
     const bounds = new google.maps.LatLngBounds();
-    markers.forEach(({ lat, lng }) => bounds.extend({ lat, lng }));
+    data.forEach(({ Latitude: lat, Longitude: lng }) => {
+      if (typeof lat === "number" && typeof lng === "number") {
+        bounds.extend({ lat, lng });
+      }
+    });
+
     map.fitBounds(bounds);
   };
 
@@ -45,10 +48,10 @@ const HomePage: React.FC = () => {
     id: number,
     lat: number,
     lng: number,
-    address: string
+    Gatuadress: string
   ) => {
     mapRef?.panTo({ lat, lng });
-    setInfoWindowData({ id, address });
+    setInfoWindowData({ id, Gatuadress, lat, lng });
     setIsOpen(true);
   };
 
@@ -62,25 +65,30 @@ const HomePage: React.FC = () => {
           onLoad={onMapLoad}
           onClick={() => setIsOpen(false)}
         >
-          {markers.map(({ address, lat, lng }, ind) => (
-            <MarkerF
-              key={ind}
-              position={{ lat, lng }}
-              onClick={() => {
-                handleMarkerClick(ind, lat, lng, address);
-              }}
-            >
-              {isOpen && infoWindowData?.id === ind && (
-                <InfoWindow
-                  onCloseClick={() => {
-                    setIsOpen(false);
-                  }}
-                >
-                  <h3>{infoWindowData.address}</h3>
-                </InfoWindow>
-              )}
-            </MarkerF>
-          ))}
+          {data.map(
+            (
+              { Gatuadress: Gatuadress, Latitude: lat, Longitude: lng },
+              ind
+            ) => (
+              <MarkerF
+                key={ind}
+                position={{ lat, lng }}
+                onClick={() => {
+                  handleMarkerClick(ind, lat, lng, Gatuadress);
+                }}
+              >
+                {isOpen && infoWindowData?.id === ind && (
+                  <InfoWindow
+                    onCloseClick={() => {
+                      setIsOpen(false);
+                    }}
+                  >
+                    <h3>{infoWindowData.Gatuadress}</h3>
+                  </InfoWindow>
+                )}
+              </MarkerF>
+            )
+          )}
         </GoogleMap>
       )}
     </div>
@@ -88,3 +96,4 @@ const HomePage: React.FC = () => {
 };
 
 export default HomePage;
+
