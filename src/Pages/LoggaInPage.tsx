@@ -33,7 +33,7 @@ const LoginPage = () => {
       await login(data.email, data.password);
 
       // If successful, redirect to the home page
-      navigate("/");
+      navigate("/restaurants");
     } catch (error) {
       if (error instanceof FirebaseError) {
         setErrorMessage(error.message);
@@ -60,30 +60,26 @@ const LoginPage = () => {
                 <Form.Group controlId="email" className="mb-3">
                   <Form.Label>Email</Form.Label>
                   <Form.Control
-                    placeholder="snelhest2000@horsemail.com"
+                    placeholder="name@epost.se"
                     type="email"
                     {...register("email", {
-                      required: "You have to enter your email",
+                      required: "Du måste uppge en mail",
                     })}
                   />
-                  {errors.email && (
-                    <p className="invalid">
-                      {errors.email.message ?? "Invalid value"}
-                    </p>
-                  )}
                 </Form.Group>
 
                 <Form.Group controlId="password" className="mb-3">
-                  <Form.Label>Password</Form.Label>
+                  <Form.Label>Lösenord</Form.Label>
                   <Form.Control
+                    placeholder="Lösenord"
                     type="password"
-                    autoComplete="new-password"
+                    autoComplete="Lösenord"
                     {...register("password", {
-                      required:
-                        "You're kidding, right? Enter your password, stupid",
+                      required: "Obligatoriskt fält",
                       minLength: {
-                        value: 3,
-                        message: "Your password is at least 3 characters",
+                        value: 6,
+                        message:
+                          "Ditt lösenord behöver vara minst 3 tecken långt",
                       },
                     })}
                   />
@@ -96,7 +92,7 @@ const LoginPage = () => {
                 </Form.Group>
 
                 <Button disabled={loading} variant="primary" type="submit">
-                  {loading ? "Logging in..." : "Log In"}
+                  {loading ? "Logging in..." : "Logga In"}
                 </Button>
               </Form>
             </Card.Body>

@@ -3,6 +3,3 @@ export interface LoginCredentials {
   password: string;
 }
 
-export type UpdateProfileFormData = {
-  // lol
-};

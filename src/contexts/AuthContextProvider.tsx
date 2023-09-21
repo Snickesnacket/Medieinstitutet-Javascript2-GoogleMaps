@@ -1,12 +1,10 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import {
   UserCredential,
-  createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   onAuthStateChanged,
   User,
   signOut,
-  sendPasswordResetEmail,
   updateProfile,
   updateEmail,
   updatePassword,
@@ -18,12 +16,8 @@ type AuthContextType = {
   currentUser: User | null;
   login: (email: string, password: string) => Promise<UserCredential>;
   logout: () => Promise<void>;
-  signup: (email: string, password: string) => Promise<UserCredential>;
   reloadUser: () => Promise<boolean>;
-  resetPassword: (email: string) => Promise<void>;
-  setEmail: (email: string) => Promise<void>;
   setDisplayName: (displayName: string) => Promise<void>;
-  setPassword: (password: string) => Promise<void>;
   setPhotoUrl: (photoURL: string) => Promise<void>;
   userEmail: string | null;
   userName: string | null;
@@ -51,10 +45,6 @@ const AuthContextProvider: React.FC<AuthContextProps> = ({ children }) => {
     return signOut(auth);
   };
 
-  const signup = (email: string, password: string) => {
-    return createUserWithEmailAndPassword(auth, email, password);
-  };
-
   const reloadUser = async () => {
     if (!auth.currentUser) {
       return false;
@@ -64,12 +54,6 @@ const AuthContextProvider: React.FC<AuthContextProps> = ({ children }) => {
     setUserPhotoUrl(auth.currentUser.photoURL);
 
     return true;
-  };
-
-  const resetPassword = (email: string) => {
-    return sendPasswordResetEmail(auth, email, {
-      url: window.location.origin + "/login",
-    });
   };
 
   const setEmail = (email: string) => {
@@ -130,12 +114,10 @@ const AuthContextProvider: React.FC<AuthContextProps> = ({ children }) => {
         login,
         logout,
         reloadUser,
-        resetPassword,
         setDisplayName,
         setEmail,
         setPassword,
         setPhotoUrl,
-        signup,
         userEmail,
         userName,
         userPhotoUrl,
