@@ -16,6 +16,7 @@ import useRestaurants from "../hooks/useGetRestaurants";
 import { InfoWindowData, LatLng } from "../types/Google.types";
 import "../assets/scss/App.scss";
 import { useEffect, useRef, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 
 type Item = {
   id: string;
@@ -43,9 +44,12 @@ export const HomePage = () => {
     null
   );
   const [zoom, setZoom] = useState(8);
-  const [mapsLibLoaded, setMapsLibLoaded] = useState<boolean>(false);
   const [selected, setSelected] = useState<LatLng | null>(null);
-  const [selectedOrt, setSelectedOrt] = useState<string | null>(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [selectedOrt, setSelectedOrt] = useState<string | null>(
+    searchParams.get("query") || null
+  );
+
   //fetch data from firebase
   const { data: restaurant } = useRestaurants();
 
@@ -74,6 +78,12 @@ export const HomePage = () => {
       setIsOpen(true);
     }
   };
+  const {
+    suggestions: { data },
+    setValue,
+  } = usePlacesAutocomplete();
+
+  const suggestion = data ? data : [];
 
   const handleOnSearch = (searchString: string) => {
     setValue(searchString);
@@ -85,9 +95,16 @@ export const HomePage = () => {
     setSelected({ lat, lng });
     setZoom(12);
     setSelectedOrt(item.name);
+    setSearchParams({ query: item.name });
 
     if (mapRef && typeof lat === "number" && typeof lng === "number") {
       mapRef.panTo({ lat, lng });
+    }
+  };
+
+  const setMapToLocation = (location: LatLng) => {
+    if (mapRef && location.lat && location.lng) {
+      mapRef.panTo(location);
     }
   };
   const onMapLoad = (map: google.maps.Map) => {
@@ -108,26 +125,24 @@ export const HomePage = () => {
   };
   useEffect(() => {
     if (isLoaded) {
-      setMapsLibLoaded(true);
+      if (selectedOrt && !selected) {
+        // Fetch the lat-lng for the selectedOrt and set the selected state
+        (async () => {
+          const results = await getGeocode({ address: selectedOrt });
+          const { lat, lng } = await getLatLng(results[0]);
+          setSelected({ lat, lng });
+          setZoom(12);
+        })();
+      }
+      if (selected) {
+        setMapToLocation(selected);
+      }
     }
-  }, [isLoaded]);
-
-  const {
-    suggestions: { data },
-    setValue,
-  } = usePlacesAutocomplete();
-
-  const suggestion = data ? data : [];
-
-  useEffect(() => {
-    if (Error) {
-      console.error("usePlacesAutocomplete error:", Error);
-    }
-  }, [Error]);
+  }, [selectedOrt, selected, isLoaded]);
 
   return (
     <div className="Homepage">
-      {!mapsLibLoaded ? (
+      {!isLoaded ? (
         <h1>Loading...</h1>
       ) : (
         <>
