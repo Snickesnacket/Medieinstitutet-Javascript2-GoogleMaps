@@ -45,22 +45,9 @@ export const HomePage = () => {
   const [zoom, setZoom] = useState(8);
   const [mapsLibLoaded, setMapsLibLoaded] = useState<boolean>(false);
   const [selected, setSelected] = useState<LatLng | null>(null);
+  const [selectedOrt, setSelectedOrt] = useState<string | null>(null);
   //fetch data from firebase
   const { data: restaurant } = useRestaurants();
-
-  const onMapLoad = (map: google.maps.Map) => {
-    setMapRef(map);
-    if (selected) {
-      map.panTo(selected);
-    }
-    const bounds = new google.maps.LatLngBounds();
-    restaurant?.forEach(({ Latitude: lat, Longitude: lng }) => {
-      if (typeof lat === "number" && typeof lng === "number") {
-        bounds.extend({ lat, lng });
-      }
-    });
-    map.fitBounds(bounds);
-  };
 
   const handleMarkerClick = (
     id: number,
@@ -96,12 +83,28 @@ export const HomePage = () => {
     const results = await getGeocode({ address: item.name });
     const { lat, lng } = await getLatLng(results[0]);
     setSelected({ lat, lng });
-
     setZoom(12);
+    setSelectedOrt(item.name);
 
     if (mapRef && typeof lat === "number" && typeof lng === "number") {
       mapRef.panTo({ lat, lng });
     }
+  };
+  const onMapLoad = (map: google.maps.Map) => {
+    setMapRef(map);
+    if (selected) {
+      map.panTo(selected);
+    }
+
+    const bounds = new google.maps.LatLngBounds();
+    restaurant
+      ?.filter((item) => item.Ort == selectedOrt)
+      .map(({ Latitude: lat, Longitude: lng }) => {
+        if (typeof lat === "number" && typeof lng === "number") {
+          bounds.extend({ lat, lng });
+        }
+      });
+    map.fitBounds(bounds);
   };
   useEffect(() => {
     if (isLoaded) {
@@ -134,51 +137,53 @@ export const HomePage = () => {
             onLoad={onMapLoad}
             onClick={() => setIsOpen(false)}
           >
-            {restaurant?.map(
-              (
-                {
-                  Gatuadress,
-                  Latitude: lat,
-                  Longitude: lng,
-                  Namn,
-                  Ort,
-                  Kategori,
-                  Utbud,
-                },
-                ind
-              ) => (
-                <MarkerF
-                  key={ind}
-                  position={{ lat, lng }}
-                  onClick={() => {
-                    handleMarkerClick(
-                      ind,
-                      lat,
-                      lng,
-                      Namn,
-                      Gatuadress,
-                      Ort,
-                      Kategori,
-                      Utbud
-                    );
-                  }}
-                >
-                  {isOpen && infoWindowData?.id === ind && (
-                    <InfoWindow
-                      onCloseClick={() => {
-                        setIsOpen(false);
-                      }}
-                    >
-                      <>
-                        <h3>{infoWindowData.Namn}</h3>
-                        <p>{infoWindowData.Gatuadress}</p>
-                        <p>{infoWindowData.Ort}</p>
-                      </>
-                    </InfoWindow>
-                  )}
-                </MarkerF>
-              )
-            )}
+            {restaurant
+              ?.filter((item) => !selectedOrt || item.Ort === selectedOrt)
+              .map(
+                (
+                  {
+                    Gatuadress,
+                    Latitude: lat,
+                    Longitude: lng,
+                    Namn,
+                    Ort,
+                    Kategori,
+                    Utbud,
+                  },
+                  ind
+                ) => (
+                  <MarkerF
+                    key={ind}
+                    position={{ lat, lng }}
+                    onClick={() => {
+                      handleMarkerClick(
+                        ind,
+                        lat,
+                        lng,
+                        Namn,
+                        Gatuadress,
+                        Ort,
+                        Kategori,
+                        Utbud
+                      );
+                    }}
+                  >
+                    {isOpen && infoWindowData?.id === ind && (
+                      <InfoWindow
+                        onCloseClick={() => {
+                          setIsOpen(false);
+                        }}
+                      >
+                        <>
+                          <h3>{infoWindowData.Namn}</h3>
+                          <p>{infoWindowData.Gatuadress}</p>
+                          <p>{infoWindowData.Ort}</p>
+                        </>
+                      </InfoWindow>
+                    )}
+                  </MarkerF>
+                )
+              )}
           </GoogleMap>
 
           <div style={{ width: 400 }}>
