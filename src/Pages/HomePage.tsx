@@ -19,7 +19,7 @@ import { useEffect, useRef, useState } from "react";
 
 type Item = {
   id: string;
-  query: string;
+  name: string;
 };
 
 export const HomePage = () => {
@@ -88,12 +88,12 @@ export const HomePage = () => {
     }
   };
 
-  const handleOnSearch = (searchString: string, results: Item[]) => {
-    console.log(searchString, results);
+  const handleOnSearch = (searchString: string) => {
+    setValue(searchString);
   };
 
   const handleOnSelect = async (item: Item) => {
-    const results = await getGeocode({ address: item.query });
+    const results = await getGeocode({ address: item.name });
     const { lat, lng } = await getLatLng(results[0]);
     setSelected({ lat, lng });
 
@@ -107,8 +107,18 @@ export const HomePage = () => {
     }
   }, [isLoaded]);
 
-  const autocomplete = usePlacesAutocomplete();
-  const suggestion = autocomplete ? autocomplete.suggestions.data : [];
+  const {
+    suggestions: { data },
+    setValue,
+  } = usePlacesAutocomplete();
+
+  const suggestion = data ? data : [];
+
+  useEffect(() => {
+    if (Error) {
+      console.error("usePlacesAutocomplete error:", Error);
+    }
+  }, [Error]);
 
   return (
     <div className="Homepage">
@@ -172,7 +182,7 @@ export const HomePage = () => {
             <ReactSearchAutocomplete
               items={suggestion.map((s) => ({
                 id: s.place_id,
-                query: s.description,
+                name: s.description,
               }))}
               onSearch={handleOnSearch}
               onSelect={handleOnSelect}
