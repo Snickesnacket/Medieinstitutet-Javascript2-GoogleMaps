@@ -16,7 +16,6 @@ const firebaseConfig = {
   storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
   messagingSenderId: import.meta.env.VITE_FIREBASE_MESSENGER_SENDER_ID,
   appId: import.meta.env.VITE_FIREBASE_APP_ID,
-  googleMapsApiKey: import.meta.env.VITE_GOOGLE_API_KEY,
 };
 
 const app = initializeApp(firebaseConfig);
