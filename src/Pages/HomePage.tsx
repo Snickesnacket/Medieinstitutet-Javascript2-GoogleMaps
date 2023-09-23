@@ -16,7 +16,7 @@ import useRestaurants from "../hooks/useGetRestaurants";
 import { InfoWindowData, LatLng } from "../types/Google.types";
 import "../assets/scss/App.scss";
 import { useEffect, useRef, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 
 type Item = {
   id: string;
@@ -28,6 +28,7 @@ export const HomePage = () => {
   if (libraries) {
     console.log("hello");
   }
+  const navigate = useNavigate();
 
   //loading google map library
   const { isLoaded } = useLoadScript({
@@ -96,6 +97,7 @@ export const HomePage = () => {
     setZoom(12);
     setSelectedOrt(item.name);
     setSearchParams({ query: item.name });
+    navigate(`?query=${encodeURIComponent(item.name)}`);
 
     if (mapRef && typeof lat === "number" && typeof lng === "number") {
       mapRef.panTo({ lat, lng });
@@ -125,20 +127,27 @@ export const HomePage = () => {
   };
   useEffect(() => {
     if (isLoaded) {
-      if (selectedOrt && !selected) {
-        // Fetch the lat-lng for the selectedOrt and set the selected state
+      const currentQuery = searchParams.get("query");
+      if (currentQuery && currentQuery !== selectedOrt) {
+        setSelectedOrt(currentQuery); // Update the state with the new query
+      }
+      if (currentQuery || selectedOrt) {
+        // This ensures logic runs even on mount with a query param
         (async () => {
-          const results = await getGeocode({ address: selectedOrt });
+          const targetOrt = currentQuery || selectedOrt;
+          const results = await getGeocode({ address: targetOrt });
           const { lat, lng } = await getLatLng(results[0]);
           setSelected({ lat, lng });
           setZoom(12);
+          if (mapRef) {
+            mapRef.panTo({ lat, lng });
+          }
         })();
-      }
-      if (selected) {
+      } else if (selected) {
         setMapToLocation(selected);
       }
     }
-  }, [selectedOrt, selected, isLoaded]);
+  }, [selectedOrt, selected, isLoaded, searchParams, mapRef]);
 
   return (
     <div className="Homepage">
