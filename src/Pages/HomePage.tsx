@@ -42,7 +42,7 @@ export const HomePage = () => {
   const [infoWindowData, setInfoWindowData] = useState<InfoWindowData | null>(
     null
   );
-
+  const [zoom, setZoom] = useState(8);
   const [mapsLibLoaded, setMapsLibLoaded] = useState<boolean>(false);
   const [selected, setSelected] = useState<LatLng | null>(null);
   //fetch data from firebase
@@ -97,6 +97,8 @@ export const HomePage = () => {
     const { lat, lng } = await getLatLng(results[0]);
     setSelected({ lat, lng });
 
+    setZoom(12);
+
     if (mapRef && typeof lat === "number" && typeof lng === "number") {
       mapRef.panTo({ lat, lng });
     }
@@ -127,6 +129,7 @@ export const HomePage = () => {
       ) : (
         <>
           <GoogleMap
+            zoom={zoom}
             mapContainerClassName="map-container"
             onLoad={onMapLoad}
             onClick={() => setIsOpen(false)}
