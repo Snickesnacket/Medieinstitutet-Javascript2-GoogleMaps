@@ -1,4 +1,4 @@
-/* import { ReactSearchAutocomplete } from "react-search-autocomplete";
+import { ReactSearchAutocomplete } from "react-search-autocomplete";
 import usePlacesAutocomplete from "use-places-autocomplete";
 
 type Item = {
@@ -36,4 +36,3 @@ export const SearchComponent = ({ handleOnSelect }: Props) => {
     </div>
   );
 };
- */

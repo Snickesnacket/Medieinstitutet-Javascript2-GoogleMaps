@@ -1,5 +1,5 @@
 export interface InfoWindowData {
-  id: number;
+  id: string;
   Namn: string;
   Gatuadress: string;
   Ort: string;
