@@ -1,8 +1,8 @@
-import { Card, ListGroup, Button } from "react-bootstrap";
-import useTips from "../hooks/usegetTips";
+import { Button } from "react-bootstrap";
+import useTips from "../hooks/useGetTips";
 import { tipsCol } from "../services/firebase";
 import { deleteDoc, doc } from "firebase/firestore";
-import { toast } from "react-toastify";
+import Table from "react-bootstrap/Table";
 
 const Tips = () => {
   const { data, loading } = useTips();
@@ -11,10 +11,9 @@ const Tips = () => {
     try {
       const docRef = doc(tipsCol, documentId);
       await deleteDoc(docRef);
-      toast.success("Deleted successfully!");
     } catch (error: unknown) {
       if (error instanceof Error) {
-        return toast.error("Error deleting tip: " + error.message);
+        return alert("Error deleting tip: " + error.message);
       }
     }
   };
@@ -22,19 +21,27 @@ const Tips = () => {
   return (
     <>
       {loading && <p>Loading...</p>}
-
-      {data && data.length > 0 && (
-        <Card style={{ width: "18rem" }}>
-          {data.map((tip) => (
-            <ListGroup variant="flush" key={tip._id}>
-              <Card.Title>From: {tip.email}</Card.Title>
-              <Card.Text>{tip.Tips}</Card.Text>
-              <Button variant="danger" onClick={() => deleteTip(tip._id)}>
-                Delete
-              </Button>
-            </ListGroup>
-          ))}
-        </Card>
+      {data && data.length && (
+        <Table responsive striped bordered hover>
+          <thead>
+            <tr>
+              <th>From</th>
+              <th>Tip</th>
+              <th>Radera</th>
+            </tr>
+          </thead>
+          <tbody>
+            {data.map((tip) => (
+              <tr key={tip._id}>
+                <td>{tip.email}</td>
+                <td>{tip.Tips}</td>
+                <Button variant="danger" onClick={() => deleteTip(tip._id)}>
+                  Delete
+                </Button>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
       )}
     </>
   );
