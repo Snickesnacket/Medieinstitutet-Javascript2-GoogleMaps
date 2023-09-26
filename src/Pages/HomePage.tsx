@@ -13,6 +13,7 @@ import { useLocation } from "react-router-dom";
 import useRestaurants from "../hooks/useGetRestaurants";
 import { InfoWindowData } from "../types/Google.types";
 import { Restaurant } from "../types/Restaurant.types";
+import { Card, Container, ListGroup, Row } from "react-bootstrap";
 
 type DefaultLocation = { lat: number; lng: number; city: string };
 const DEFAULT_LOCATION: DefaultLocation = {
@@ -100,20 +101,6 @@ const Map = () => {
     }
   }, [initialLat, initialLng]);
 
-  useEffect(() => {
-    console.log("restaurants", restaurants);
-    const result = restaurants?.filter((restaurant) => {
-      console.log(
-        "firebase ort ",
-        restaurant.Ort,
-        "selectedCity",
-        selectedCity
-      );
-      return restaurant.Ort === selectedCity;
-    });
-    console.log("resultat i useEffect", result);
-  }, [restaurants]);
-
   if (!isLoaded)
     return (
       <div>
@@ -129,39 +116,58 @@ const Map = () => {
     );
 
   return (
-    <GoogleMap
-      zoom={zoom}
-      center={location}
-      mapContainerClassName="map-container"
-      onLoad={onLoad}
-    >
-      {restaurants &&
-        restaurants
-          .filter((restaurant) => {
-            console.log(
-              "firebase ort ",
-              restaurant.Ort,
-              "selectedCity",
-              selectedCity
-            );
-            return restaurant.Ort === selectedCity;
-          })
-          .map((restaurant) => (
-            <MarkerF
-              key={restaurant._id}
-              position={{ lat: restaurant.Latitude, lng: restaurant.Longitude }}
-              onClick={() => handleMarkerClick(restaurant)}
-            >
-              {isOpen && infoWindowData?.id === restaurant._id && (
-                <InfoWindow onCloseClick={() => setIsOpen(false)}>
-                  <h3>{infoWindowData.Namn}</h3>
-                  {/* Add other restaurant details here if needed */}
-                </InfoWindow>
-              )}
-            </MarkerF>
-          ))}
+    <>
       <SearchComponent handleOnSelect={handleOnSelect} />
-    </GoogleMap>
+      <GoogleMap
+        zoom={zoom}
+        center={location}
+        mapContainerClassName="map-container"
+        onLoad={onLoad}
+      >
+        {restaurants &&
+          restaurants
+            .filter((restaurant) => {
+              return restaurant.Ort === selectedCity;
+            })
+            .map((restaurant) => (
+              <MarkerF
+                key={restaurant._id}
+                position={{
+                  lat: restaurant.Latitude,
+                  lng: restaurant.Longitude,
+                }}
+                onClick={() => handleMarkerClick(restaurant)}
+              >
+                {isOpen && infoWindowData?.id === restaurant._id && (
+                  <InfoWindow onCloseClick={() => setIsOpen(false)}>
+                    <h3>{infoWindowData.Namn}</h3>
+                  </InfoWindow>
+                )}
+              </MarkerF>
+            ))}
+      </GoogleMap>
+      {restaurants && (
+        <ListGroup className="mb-6">
+          <Container>
+            <Row>
+              {restaurants
+                .filter((restaurant) => {
+                  return restaurant.Ort === selectedCity;
+                })
+                .map((restaurant) => (
+                  <Card className="m-2">
+                    <Card.Body>
+                      <Card.Title>{restaurant.Namn}</Card.Title>
+                      <Card.Text>{restaurant.Beskrivning}</Card.Text>
+                      <Card.Text>{restaurant.hemsida}</Card.Text>
+                    </Card.Body>
+                  </Card>
+                ))}
+            </Row>
+          </Container>
+        </ListGroup>
+      )}
+    </>
   );
 };
 
