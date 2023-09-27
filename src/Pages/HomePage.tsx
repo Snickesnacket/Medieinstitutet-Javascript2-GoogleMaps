@@ -2,7 +2,6 @@ import {
   GoogleMap,
   useJsApiLoader,
   Libraries,
-  InfoWindow,
   MarkerF,
 } from "@react-google-maps/api";
 import { useEffect, useState } from "react";
@@ -10,15 +9,17 @@ import { SearchComponent } from "../components/SearchComponent";
 import { getGeocode, getLatLng } from "use-places-autocomplete";
 import { useLocation } from "react-router-dom";
 import useRestaurants from "../hooks/useGetRestaurants";
-import { InfoWindowData } from "../types/Google.types";
+import { DefaultLocation, InfoWindowData, Item } from "../types/Google.types";
 import { Restaurant } from "../types/Restaurant.types";
-import { Button, Card, Container, ListGroup, Row } from "react-bootstrap";
+import { Button } from "react-bootstrap";
 import { fetchAndGeocodeRestaurants } from "../hooks/useUpdateGeorestaurants";
 import { getCurrentPosition } from "../components/GetMyLocation";
 import useLocationUpdater from "../hooks/useLocationUpdater";
-import { filteredRestaurants } from "../components/filteredRestaurants";
+import { FilteredRestaurants } from "../components/FilterRestaurants";
+import { MarkersComponent } from "../components/markers";
+import { RenderRestaurantsList } from "../components/RenderRestaurantList";
+import useDirections from "../hooks/useDirection";
 
-type DefaultLocation = { lat: number; lng: number; city: string };
 const DEFAULT_LOCATION: DefaultLocation = {
   lat: 55.604981,
   lng: 13.003822,
@@ -26,11 +27,6 @@ const DEFAULT_LOCATION: DefaultLocation = {
 };
 const libraries: Libraries = ["places"];
 const defaultZoom = 13;
-
-type Item = {
-  id: string;
-  name: string;
-};
 
 const Map = () => {
   const searchParams = new URLSearchParams(window.location.search);
@@ -55,13 +51,12 @@ const Map = () => {
   const [selectedCity, setSelectedCity] = useState<string>(initialParams.city);
   const [zoom, setZoom] = useState(defaultZoom);
   const { data: restaurants } = useRestaurants();
-  const validRestaurants = filteredRestaurants(restaurants || [], selectedCity);
-
-  // Get map and places!
+  const validRestaurants = FilteredRestaurants(restaurants || [], selectedCity);
   const { isLoaded, loadError } = useJsApiLoader({
     googleMapsApiKey: import.meta.env.VITE_FIREBASE_GOOGLE_API_KEY,
     libraries: libraries,
   });
+  const { showDirections, directionsRenderer } = useDirections(isLoaded);
 
   useEffect(() => {
     const searchParams = new URLSearchParams(URLLocation.search);
@@ -77,39 +72,6 @@ const Map = () => {
     restaurants || [],
     fetchAndGeocodeRestaurants
   );
-
-  const [directionsService, setDirectionsService] =
-    useState<google.maps.DirectionsService | null>(null);
-  const [directionsRenderer, setDirectionsRenderer] =
-    useState<google.maps.DirectionsRenderer | null>(null);
-  useEffect(() => {
-    if (isLoaded) {
-      // Initialize them once API is loaded
-      setDirectionsService(new google.maps.DirectionsService());
-      setDirectionsRenderer(new google.maps.DirectionsRenderer());
-    }
-  }, [isLoaded]);
-
-  const showDirections = (
-    start: google.maps.LatLngLiteral,
-    end: google.maps.LatLngLiteral
-  ) => {
-    if (!directionsService || !directionsRenderer) {
-      return;
-    }
-    const request: google.maps.DirectionsRequest = {
-      origin: start,
-      destination: end,
-      travelMode: google.maps.TravelMode.DRIVING,
-    };
-    directionsService.route(request, (result, status) => {
-      if (status === google.maps.DirectionsStatus.OK) {
-        directionsRenderer.setDirections(result);
-      } else {
-        console.error("Directions request failed due to " + status);
-      }
-    });
-  };
 
   const handleOnSelect = async (item: Item) => {
     const results = await getGeocode({ address: item.name });
@@ -147,7 +109,6 @@ const Map = () => {
   };
 
   useEffect(() => {
-    // If lat or lng is not provided in the URL, set it to default and update the URL
     if (!initialParams.lat || !initialParams.lng) {
       const newURL = `${window.location.origin}${window.location.pathname}?lat=${DEFAULT_LOCATION.lat}&lng=${DEFAULT_LOCATION.lng}&city=${DEFAULT_LOCATION.city}`;
       window.history.pushState({}, "", newURL);
@@ -181,23 +142,13 @@ const Map = () => {
           }
         }}
       >
-        {validRestaurants &&
-          validRestaurants.map((restaurant) => (
-            <MarkerF
-              key={restaurant._id}
-              position={{
-                lat: restaurant.Latitude!,
-                lng: restaurant.Longitude!,
-              }}
-              onClick={() => handleMarkerClick(restaurant)}
-            >
-              {isOpen && infoWindowData?.id === restaurant._id && (
-                <InfoWindow onCloseClick={() => setIsOpen(false)}>
-                  <h3>{infoWindowData.Namn}</h3>
-                </InfoWindow>
-              )}
-            </MarkerF>
-          ))}
+        <MarkersComponent
+          validRestaurants={validRestaurants}
+          handleMarkerClick={handleMarkerClick}
+          handleInfoWindowClose={() => setIsOpen(false)}
+          isOpen={isOpen}
+          infoWindowData={infoWindowData}
+        />
         {myPosition && <MarkerF position={myPosition} label="Me" />}
         <SearchComponent handleOnSelect={handleOnSelect} />
       </GoogleMap>
@@ -222,31 +173,9 @@ const Map = () => {
       >
         Get my position
       </Button>
-      {restaurants && (
-        <ListGroup className="mb-6">
-          <Container>
-            <Row>
-              {restaurants
-                .filter((restaurant) => {
-                  return restaurant.Ort === selectedCity;
-                })
-                .map((restaurant) => (
-                  <Card key={restaurant._id} className="m-2">
-                    <Card.Body>
-                      <Card.Title>{restaurant.Namn}</Card.Title>
-                      <Card.Text>{restaurant.Beskrivning}</Card.Text>
-                      <Card.Text>{restaurant.hemsida}</Card.Text>
-                    </Card.Body>
-                  </Card>
-                ))}
-            </Row>
-          </Container>
-        </ListGroup>
-      )}
+      <RenderRestaurantsList validRestaurants={validRestaurants} />
     </>
   );
 };
 
 export default Map;
-
-

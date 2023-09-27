@@ -1,6 +1,6 @@
 import { Restaurant } from "../types/Restaurant.types";
 
-export const filteredRestaurants = (restaurants: Restaurant[], city: string) =>
+export const FilteredRestaurants = (restaurants: Restaurant[], city: string) =>
   restaurants.filter(
     (restaurant) =>
       restaurant.Ort === city &&
