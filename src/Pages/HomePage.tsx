@@ -14,6 +14,7 @@ import useRestaurants from "../hooks/useGetRestaurants";
 import { InfoWindowData } from "../types/Google.types";
 import { Restaurant } from "../types/Restaurant.types";
 import { Card, Container, ListGroup, Row } from "react-bootstrap";
+import { fetchAndGeocodeRestaurants } from "../hooks/useUpdateLocation";
 
 type DefaultLocation = { lat: number; lng: number; city: string };
 const DEFAULT_LOCATION: DefaultLocation = {
@@ -54,6 +55,7 @@ const Map = () => {
     const lat = Number(searchParams.get("lat")) || DEFAULT_LOCATION.lat;
     const lng = Number(searchParams.get("lng")) || DEFAULT_LOCATION.lng;
     const city = String(searchParams.get("city")) || DEFAULT_LOCATION.city;
+
     setLocation({ lat, lng, city });
     setSelectedCity(city);
   }, [URLLocation.search]);
@@ -66,11 +68,13 @@ const Map = () => {
     setLocation({ lat, lng, city });
     const newURL = `${window.location.origin}${window.location.pathname}?lat=${lat}&lng=${lng}&city=${city}`;
     window.history.pushState({}, "", newURL);
+    if (restaurants) {
+      await fetchAndGeocodeRestaurants(city, restaurants);
+    }
     clearSuggestions();
   };
 
   const handleMarkerClick = (restaurant: Restaurant) => {
-    console.log(restaurants);
     setIsOpen(true);
     setInfoWindowData({
       id: restaurant._id,
@@ -79,8 +83,8 @@ const Map = () => {
       Gatuadress: restaurant.Gatuadress,
       Kategori: restaurant.Kategori,
       Utbud: restaurant.Utbud,
-      lat: restaurant.Latitude,
-      lng: restaurant.Longitude,
+      lat: restaurant.Latitude!,
+      lng: restaurant.Longitude!,
     });
   };
 
@@ -123,14 +127,18 @@ const Map = () => {
         {restaurants &&
           restaurants
             .filter((restaurant) => {
-              return restaurant.Ort === selectedCity;
+              return (
+                restaurant.Ort === selectedCity &&
+                typeof restaurant.Latitude !== "undefined" &&
+                typeof restaurant.Longitude !== "undefined"
+              );
             })
             .map((restaurant) => (
               <MarkerF
                 key={restaurant._id}
                 position={{
-                  lat: restaurant.Latitude,
-                  lng: restaurant.Longitude,
+                  lat: restaurant.Latitude!,
+                  lng: restaurant.Longitude!,
                 }}
                 onClick={() => handleMarkerClick(restaurant)}
               >
@@ -169,3 +177,5 @@ const Map = () => {
 };
 
 export default Map;
+
+
