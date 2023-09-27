@@ -5,7 +5,7 @@ import {
   InfoWindow,
   MarkerF,
 } from "@react-google-maps/api";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { SearchComponent } from "../components/SearchComponent";
 
 import { getGeocode, getLatLng } from "use-places-autocomplete";
@@ -89,8 +89,6 @@ const Map = () => {
     googleMapsApiKey: import.meta.env.VITE_FIREBASE_GOOGLE_API_KEY,
     libraries: libraries,
   });
-
-  
 
   useEffect(() => {
     // If lat or lng is not provided in the URL, set it to default and update the URL
