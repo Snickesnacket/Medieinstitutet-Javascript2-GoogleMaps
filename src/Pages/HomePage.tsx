@@ -7,15 +7,16 @@ import {
 } from "@react-google-maps/api";
 import { useEffect, useState } from "react";
 import { SearchComponent } from "../components/SearchComponent";
-
 import { getGeocode, getLatLng } from "use-places-autocomplete";
 import { useLocation } from "react-router-dom";
 import useRestaurants from "../hooks/useGetRestaurants";
 import { InfoWindowData } from "../types/Google.types";
 import { Restaurant } from "../types/Restaurant.types";
 import { Button, Card, Container, ListGroup, Row } from "react-bootstrap";
-import { fetchAndGeocodeRestaurants } from "../hooks/useUpdateLocation";
+import { fetchAndGeocodeRestaurants } from "../hooks/useUpdateGeorestaurants";
 import { getCurrentPosition } from "../components/GetMyLocation";
+import useLocationUpdater from "../hooks/useLocationUpdater";
+import { filteredRestaurants } from "../components/filteredRestaurants";
 
 type DefaultLocation = { lat: number; lng: number; city: string };
 const DEFAULT_LOCATION: DefaultLocation = {
@@ -33,23 +34,28 @@ type Item = {
 
 const Map = () => {
   const searchParams = new URLSearchParams(window.location.search);
-  const initialLat = Number(searchParams.get("lat")) || DEFAULT_LOCATION.lat;
-  const initialLng = Number(searchParams.get("lng")) || DEFAULT_LOCATION.lng;
-  const initialCity = String(searchParams.get("city")) || DEFAULT_LOCATION.city;
+
+  const initialParams = {
+    lat: Number(searchParams.get("lat")) || DEFAULT_LOCATION.lat,
+    lng: Number(searchParams.get("lng")) || DEFAULT_LOCATION.lng,
+    city: String(searchParams.get("city")) || DEFAULT_LOCATION.city,
+  };
   const URLLocation = useLocation();
   const [location, setLocation] = useState<DefaultLocation>({
-    lat: initialLat,
-    lng: initialLng,
-    city: initialCity,
+    lat: initialParams.lat,
+    lng: initialParams.lng,
+    city: initialParams.city,
   });
-
+  const [myPosition, setMyPosition] =
+    useState<google.maps.LatLngLiteral | null>(null);
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [infoWindowData, setInfoWindowData] = useState<InfoWindowData | null>(
     null
   );
-  const [selectedCity, setSelectedCity] = useState<string>(initialCity);
+  const [selectedCity, setSelectedCity] = useState<string>(initialParams.city);
   const [zoom, setZoom] = useState(defaultZoom);
   const { data: restaurants } = useRestaurants();
+  const validRestaurants = filteredRestaurants(restaurants || [], selectedCity);
 
   // Get map and places!
   const { isLoaded, loadError } = useJsApiLoader({
@@ -58,7 +64,6 @@ const Map = () => {
   });
 
   useEffect(() => {
-    // Update the map location based on the URL
     const searchParams = new URLSearchParams(URLLocation.search);
     const lat = Number(searchParams.get("lat")) || DEFAULT_LOCATION.lat;
     const lng = Number(searchParams.get("lng")) || DEFAULT_LOCATION.lng;
@@ -68,11 +73,15 @@ const Map = () => {
     setSelectedCity(city);
   }, [URLLocation.search]);
 
+  const updateLocationAndFetchRestaurants = useLocationUpdater(
+    restaurants || [],
+    fetchAndGeocodeRestaurants
+  );
+
   const [directionsService, setDirectionsService] =
     useState<google.maps.DirectionsService | null>(null);
   const [directionsRenderer, setDirectionsRenderer] =
     useState<google.maps.DirectionsRenderer | null>(null);
-
   useEffect(() => {
     if (isLoaded) {
       // Initialize them once API is loaded
@@ -91,7 +100,7 @@ const Map = () => {
     const request: google.maps.DirectionsRequest = {
       origin: start,
       destination: end,
-      travelMode: google.maps.TravelMode.DRIVING, // or WALKING, TRANSIT, BICYCLING
+      travelMode: google.maps.TravelMode.DRIVING,
     };
     directionsService.route(request, (result, status) => {
       if (status === google.maps.DirectionsStatus.OK) {
@@ -102,18 +111,12 @@ const Map = () => {
     });
   };
 
-  const handleOnSelect = async (item: Item, clearSuggestions: () => void) => {
+  const handleOnSelect = async (item: Item) => {
     const results = await getGeocode({ address: item.name });
     const { lat, lng } = await getLatLng(results[0]);
-    const city = results[0].address_components[0].long_name;
-    setSelectedCity(city);
-    setLocation({ lat, lng, city });
-    const newURL = `${window.location.origin}${window.location.pathname}?lat=${lat}&lng=${lng}&city=${city}`;
-    window.history.pushState({}, "", newURL);
-    if (restaurants) {
-      await fetchAndGeocodeRestaurants(city, restaurants);
-    }
-    clearSuggestions();
+    const updatedLocation = await updateLocationAndFetchRestaurants(lat, lng);
+    setLocation(updatedLocation);
+    setSelectedCity(updatedLocation.city);
   };
   const handleDefaultClick = () => {
     const defaultURL = `${window.location.origin}${window.location.pathname}?lat=${DEFAULT_LOCATION.lat}&lng=${DEFAULT_LOCATION.lng}&city=${DEFAULT_LOCATION.city}`;
@@ -145,12 +148,12 @@ const Map = () => {
 
   useEffect(() => {
     // If lat or lng is not provided in the URL, set it to default and update the URL
-    if (!initialLat || !initialLng) {
+    if (!initialParams.lat || !initialParams.lng) {
       const newURL = `${window.location.origin}${window.location.pathname}?lat=${DEFAULT_LOCATION.lat}&lng=${DEFAULT_LOCATION.lng}&city=${DEFAULT_LOCATION.city}`;
       window.history.pushState({}, "", newURL);
       setZoom(defaultZoom);
     }
-  }, [initialLat, initialLng]);
+  }, [initialParams.lat, initialParams.lng]);
 
   if (!isLoaded)
     return (
@@ -178,48 +181,47 @@ const Map = () => {
           }
         }}
       >
-        {restaurants &&
-          restaurants
-            .filter((restaurant) => {
-              return (
-                restaurant.Ort === selectedCity &&
-                typeof restaurant.Latitude !== "undefined" &&
-                typeof restaurant.Longitude !== "undefined"
-              );
-            })
-            .map((restaurant) => (
-              <MarkerF
-                key={restaurant._id}
-                position={{
-                  lat: restaurant.Latitude!,
-                  lng: restaurant.Longitude!,
-                }}
-                onClick={() => handleMarkerClick(restaurant)}
-              >
-                {isOpen && infoWindowData?.id === restaurant._id && (
-                  <InfoWindow onCloseClick={() => setIsOpen(false)}>
-                    <h3>{infoWindowData.Namn}</h3>
-                  </InfoWindow>
-                )}
-              </MarkerF>
-            ))}
+        {validRestaurants &&
+          validRestaurants.map((restaurant) => (
+            <MarkerF
+              key={restaurant._id}
+              position={{
+                lat: restaurant.Latitude!,
+                lng: restaurant.Longitude!,
+              }}
+              onClick={() => handleMarkerClick(restaurant)}
+            >
+              {isOpen && infoWindowData?.id === restaurant._id && (
+                <InfoWindow onCloseClick={() => setIsOpen(false)}>
+                  <h3>{infoWindowData.Namn}</h3>
+                </InfoWindow>
+              )}
+            </MarkerF>
+          ))}
+        {myPosition && <MarkerF position={myPosition} label="Me" />}
         <SearchComponent handleOnSelect={handleOnSelect} />
       </GoogleMap>
       <Button variant="secondary" onClick={handleDefaultClick}>
         Go back to default
       </Button>
 
-      {/* <Button
+      <Button
         onClick={() => {
           getCurrentPosition()
-            .then((pos) =>
-              setLocation({ ...location, lat: pos.lat, lng: pos.lng })
-            )
+            .then(async (pos) => {
+              const updatedLocation = await updateLocationAndFetchRestaurants(
+                pos.lat,
+                pos.lng
+              );
+              setLocation(updatedLocation);
+              setSelectedCity(updatedLocation.city);
+              setMyPosition(pos);
+            })
             .catch((error) => alert(error.message));
         }}
       >
         Get my position
-      </Button> */}
+      </Button>
       {restaurants && (
         <ListGroup className="mb-6">
           <Container>

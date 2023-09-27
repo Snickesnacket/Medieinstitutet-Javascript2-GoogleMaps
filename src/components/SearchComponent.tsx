@@ -7,14 +7,13 @@ type Item = {
 };
 
 type Props = {
-  handleOnSelect: (item: Item, clearSuggestions: () => void) => Promise<void>;
+  handleOnSelect: (item: Item) => Promise<void>;
 };
 
 export const SearchComponent = ({ handleOnSelect }: Props) => {
   const {
     suggestions: { data },
     setValue,
-    clearSuggestions,
   } = usePlacesAutocomplete();
 
   const suggestion = data ? data : [];
@@ -31,7 +30,7 @@ export const SearchComponent = ({ handleOnSelect }: Props) => {
           name: s.description,
         }))}
         onSearch={handleOnSearch}
-        onSelect={(item) => handleOnSelect(item, clearSuggestions)}
+        onSelect={(item) => handleOnSelect(item)}
         autoFocus
       />
     </div>

@@ -7,7 +7,7 @@ export const fetchAndGeocodeRestaurants = async (
   city: string,
   restaurants: Restaurant[]
 ) => {
-  const cityRestaurants = restaurants.filter((r) => r.Ort === city);
+  const cityRestaurants = restaurants.filter((area) => area.Ort === city);
 
   const updatePromises = cityRestaurants.map(async (restaurant) => {
     if (
@@ -19,7 +19,6 @@ export const fetchAndGeocodeRestaurants = async (
       });
       const { lat, lng } = await getLatLng(restaurantLocation[0]);
 
-      // Update the restaurant's data in Firebase with the newly acquired latitude and longitude
       const restaurantRef = doc(restuantCol, restaurant._id);
       return setDoc(
         restaurantRef,
