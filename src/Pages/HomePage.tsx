@@ -13,8 +13,9 @@ import { useLocation } from "react-router-dom";
 import useRestaurants from "../hooks/useGetRestaurants";
 import { InfoWindowData } from "../types/Google.types";
 import { Restaurant } from "../types/Restaurant.types";
-import { Card, Container, ListGroup, Row } from "react-bootstrap";
+import { Button, Card, Container, ListGroup, Row } from "react-bootstrap";
 import { fetchAndGeocodeRestaurants } from "../hooks/useUpdateLocation";
+import { getCurrentPosition } from "../components/GetMyLocation";
 
 type DefaultLocation = { lat: number; lng: number; city: string };
 const DEFAULT_LOCATION: DefaultLocation = {
@@ -41,6 +42,7 @@ const Map = () => {
     lng: initialLng,
     city: initialCity,
   });
+
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [infoWindowData, setInfoWindowData] = useState<InfoWindowData | null>(
     null
@@ -48,6 +50,12 @@ const Map = () => {
   const [selectedCity, setSelectedCity] = useState<string>(initialCity);
   const [zoom, setZoom] = useState(defaultZoom);
   const { data: restaurants } = useRestaurants();
+
+  // Get map and places!
+  const { isLoaded, loadError } = useJsApiLoader({
+    googleMapsApiKey: import.meta.env.VITE_FIREBASE_GOOGLE_API_KEY,
+    libraries: libraries,
+  });
 
   useEffect(() => {
     // Update the map location based on the URL
@@ -59,6 +67,40 @@ const Map = () => {
     setLocation({ lat, lng, city });
     setSelectedCity(city);
   }, [URLLocation.search]);
+
+  const [directionsService, setDirectionsService] =
+    useState<google.maps.DirectionsService | null>(null);
+  const [directionsRenderer, setDirectionsRenderer] =
+    useState<google.maps.DirectionsRenderer | null>(null);
+
+  useEffect(() => {
+    if (isLoaded) {
+      // Initialize them once API is loaded
+      setDirectionsService(new google.maps.DirectionsService());
+      setDirectionsRenderer(new google.maps.DirectionsRenderer());
+    }
+  }, [isLoaded]);
+
+  const showDirections = (
+    start: google.maps.LatLngLiteral,
+    end: google.maps.LatLngLiteral
+  ) => {
+    if (!directionsService || !directionsRenderer) {
+      return;
+    }
+    const request: google.maps.DirectionsRequest = {
+      origin: start,
+      destination: end,
+      travelMode: google.maps.TravelMode.DRIVING, // or WALKING, TRANSIT, BICYCLING
+    };
+    directionsService.route(request, (result, status) => {
+      if (status === google.maps.DirectionsStatus.OK) {
+        directionsRenderer.setDirections(result);
+      } else {
+        console.error("Directions request failed due to " + status);
+      }
+    });
+  };
 
   const handleOnSelect = async (item: Item, clearSuggestions: () => void) => {
     const results = await getGeocode({ address: item.name });
@@ -73,8 +115,11 @@ const Map = () => {
     }
     clearSuggestions();
   };
-
-  const handleMarkerClick = (restaurant: Restaurant) => {
+  const handleDefaultClick = () => {
+    const defaultURL = `${window.location.origin}${window.location.pathname}?lat=${DEFAULT_LOCATION.lat}&lng=${DEFAULT_LOCATION.lng}&city=${DEFAULT_LOCATION.city}`;
+    window.location.href = defaultURL;
+  };
+  const handleMarkerClick = async (restaurant: Restaurant) => {
     setIsOpen(true);
     setInfoWindowData({
       id: restaurant._id,
@@ -86,13 +131,17 @@ const Map = () => {
       lat: restaurant.Latitude!,
       lng: restaurant.Longitude!,
     });
+    try {
+      const currentPosition = await getCurrentPosition();
+      const restaurantPosition = {
+        lat: restaurant.Latitude!,
+        lng: restaurant.Longitude!,
+      };
+      showDirections(currentPosition, restaurantPosition);
+    } catch (error) {
+      console.error("Error getting user position:", error);
+    }
   };
-
-  // Get map and places!
-  const { isLoaded, loadError } = useJsApiLoader({
-    googleMapsApiKey: import.meta.env.VITE_FIREBASE_GOOGLE_API_KEY,
-    libraries: libraries,
-  });
 
   useEffect(() => {
     // If lat or lng is not provided in the URL, set it to default and update the URL
@@ -123,6 +172,11 @@ const Map = () => {
         zoom={zoom}
         center={location}
         mapContainerClassName="map-container"
+        onLoad={(map) => {
+          if (directionsRenderer) {
+            directionsRenderer.setMap(map);
+          }
+        }}
       >
         {restaurants &&
           restaurants
@@ -151,6 +205,21 @@ const Map = () => {
             ))}
         <SearchComponent handleOnSelect={handleOnSelect} />
       </GoogleMap>
+      <Button variant="secondary" onClick={handleDefaultClick}>
+        Go back to default
+      </Button>
+
+      {/* <Button
+        onClick={() => {
+          getCurrentPosition()
+            .then((pos) =>
+              setLocation({ ...location, lat: pos.lat, lng: pos.lng })
+            )
+            .catch((error) => alert(error.message));
+        }}
+      >
+        Get my position
+      </Button> */}
       {restaurants && (
         <ListGroup className="mb-6">
           <Container>
