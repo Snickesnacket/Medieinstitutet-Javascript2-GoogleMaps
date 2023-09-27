@@ -12,6 +12,11 @@ html, body {
   height: 100vh;
 }
 
+.img-square {
+	aspect-ratio: 1;
+	object-fit: cover;
+}
+
 .map-container {
   height: 300px; 
   @media (min-width: 768px) {
