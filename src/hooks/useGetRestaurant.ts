@@ -1,9 +1,9 @@
 import { restuantCol } from "../services/firebase";
 import { Restaurant } from "../types/Restaurant.types";
-import useStreamDocument from "./useStreamDocument";
+import useGetDocument from "./useGetDocument";
 
 const useRestaurant = (documentId: string) => {
-  return useStreamDocument<Restaurant>(restuantCol, documentId);
+  return useGetDocument<Restaurant>(restuantCol, documentId);
 };
 
 export default useRestaurant;

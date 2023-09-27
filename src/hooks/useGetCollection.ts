@@ -1,33 +1,37 @@
-import { CollectionReference, getDocs } from "firebase/firestore";
-import { useCallback, useEffect, useState } from "react";
+import {
+  CollectionReference,
+  QueryConstraint,
+  onSnapshot,
+  query,
+} from "firebase/firestore";
+import { useEffect, useState } from "react";
 
-const useGetCollection = <T>(colRef: CollectionReference<T>) => {
+const useGetCollection = <T>(
+  colRef: CollectionReference<T>,
+  ...queryConstraints: QueryConstraint[]
+) => {
   const [data, setData] = useState<T[] | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const getData = useCallback(async () => {
-    setLoading(true);
+  useEffect(() => {
+    const queryRef = query(colRef, ...queryConstraints);
+    const unsubscribe = onSnapshot(queryRef, (snapshot) => {
+      const data: T[] = snapshot.docs.map((doc) => {
+        return {
+          ...doc.data(),
+          _id: doc.id,
+        };
+      });
 
-    const snapshot = await getDocs(colRef); // where här
-
-    const data: T[] = snapshot.docs.map((doc) => {
-      return {
-        ...doc.data(),
-        _id: doc.id,
-      };
+      setData(data);
+      setLoading(false);
     });
 
-    setData(data);
-    setLoading(false);
+    return unsubscribe;
   }, [colRef]);
-
-  useEffect(() => {
-    getData();
-  }, [getData]);
 
   return {
     data,
-    getData,
     loading,
   };
 };
