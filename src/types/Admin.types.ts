@@ -11,3 +11,9 @@ export type UpdateProfileFormData = {
   password: string;
   passwordConfirm: string;
 };
+
+export type AdminData = {
+  _id: string;
+  Namn: string;
+  photoURL?: string;
+};

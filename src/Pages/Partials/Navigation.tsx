@@ -42,6 +42,9 @@ function Navigation() {
                   <NavDropdown.Item as={NavLink} to="/UpdateProfile">
                     UPPDATERA PROFIL
                   </NavDropdown.Item>
+                  <NavDropdown.Item as={NavLink} to="/Admins">
+                    ALLA ADMIN
+                  </NavDropdown.Item>
                   <NavDropdown.Item as={NavLink} to="/Create">
                     LÄGG TILL RESTAURANG
                   </NavDropdown.Item>

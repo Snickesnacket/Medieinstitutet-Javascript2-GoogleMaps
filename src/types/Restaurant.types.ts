@@ -31,5 +31,5 @@ export interface RestaurantFormData {
   instagram?: string;
 }
 
-
+export type NewRestaurant = Omit<Restaurant, "_id">;
 export type Restaurants = Restaurant[];
