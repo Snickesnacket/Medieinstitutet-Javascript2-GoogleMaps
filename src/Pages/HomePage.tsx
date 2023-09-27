@@ -55,16 +55,18 @@ const Map = () => {
     const lng = Number(searchParams.get("lng")) || DEFAULT_LOCATION.lng;
     const city = String(searchParams.get("city")) || DEFAULT_LOCATION.city;
     setLocation({ lat, lng, city });
+    setSelectedCity(city);
   }, [URLLocation.search]);
 
-  const handleOnSelect = async (item: Item) => {
+  const handleOnSelect = async (item: Item, clearSuggestions: () => void) => {
     const results = await getGeocode({ address: item.name });
     const { lat, lng } = await getLatLng(results[0]);
     const city = results[0].address_components[0].long_name;
     setSelectedCity(city);
     setLocation({ lat, lng, city });
-    const newURL = `${window.location.origin}${window.location.pathname}?lat=${lat}&lng=${lng}&city=${selectedCity}`;
+    const newURL = `${window.location.origin}${window.location.pathname}?lat=${lat}&lng=${lng}&city=${city}`;
     window.history.pushState({}, "", newURL);
+    clearSuggestions();
   };
 
   const handleMarkerClick = (restaurant: Restaurant) => {
@@ -88,9 +90,7 @@ const Map = () => {
     libraries: libraries,
   });
 
-  const onLoad = useCallback((map: google.maps.Map) => {
-    console.log(map);
-  }, []);
+  
 
   useEffect(() => {
     // If lat or lng is not provided in the URL, set it to default and update the URL
@@ -117,12 +117,10 @@ const Map = () => {
 
   return (
     <>
-      <SearchComponent handleOnSelect={handleOnSelect} />
       <GoogleMap
         zoom={zoom}
         center={location}
         mapContainerClassName="map-container"
-        onLoad={onLoad}
       >
         {restaurants &&
           restaurants
@@ -145,6 +143,7 @@ const Map = () => {
                 )}
               </MarkerF>
             ))}
+        <SearchComponent handleOnSelect={handleOnSelect} />
       </GoogleMap>
       {restaurants && (
         <ListGroup className="mb-6">
@@ -155,7 +154,7 @@ const Map = () => {
                   return restaurant.Ort === selectedCity;
                 })
                 .map((restaurant) => (
-                  <Card className="m-2">
+                  <Card key={restaurant._id} className="m-2">
                     <Card.Body>
                       <Card.Title>{restaurant.Namn}</Card.Title>
                       <Card.Text>{restaurant.Beskrivning}</Card.Text>
