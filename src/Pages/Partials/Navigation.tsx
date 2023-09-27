@@ -3,7 +3,7 @@ import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import { NavLink } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
-import { NavDropdown, Image } from "react-bootstrap"; // Import the Image component
+import { NavDropdown, Image } from "react-bootstrap";
 
 function Navigation() {
   const { currentUser, userEmail, userName, userPhotoUrl } = useAuth();
@@ -16,17 +16,16 @@ function Navigation() {
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="navbarScroll" />
         <Navbar.Collapse id="navbarScroll">
-          <Nav className="ms-auto">
+          <Nav className="me-auto">
             {currentUser ? (
               <>
-                {/* User is logged in */}
                 <Nav.Link as={NavLink} to="/Restaurants"></Nav.Link>
-
                 <NavDropdown
+                  id="basic-nav-dropdown"
                   title={
                     userPhotoUrl ? (
                       <Image
-                        src="https://media.pitchfork.com/photos/636c08f28c17fa7c51b8112f/2:1/w_1920,c_limit/Snoop-Dogg-2022.jpg"
+                        src={userPhotoUrl}
                         height={30}
                         width={30}
                         title={(userName || userEmail) ?? ""}

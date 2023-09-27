@@ -17,6 +17,10 @@ html, body {
 	object-fit: cover;
 }
 
+.dropdown-menu {
+    right: 0;
+    left: auto;
+}
 .map-container {
   height: 300px; 
   @media (min-width: 768px) {
