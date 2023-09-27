@@ -1,5 +1,24 @@
-@import "bootstrap/scss/bootstrap"; 
+@import "bootstrap/scss/bootstrap";
 
-#App{
-    min-height: 100vh; 
+html, body {
+  background-color: $gray-900;
+  color: $gray-200;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.Homepage {
+  height: 100vh;
+}
+
+.map-container {
+  height: 300px; 
+  @media (min-width: 768px) {
+    height: 400px;
+  }
+
+  @media (min-width: 992px) {
+    height: 500px;
+  }
 }
