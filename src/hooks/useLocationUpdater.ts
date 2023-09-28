@@ -1,5 +1,4 @@
 import { getGeocode } from "use-places-autocomplete";
-
 import { Restaurant } from "../types/Restaurant.types";
 
 type AddressComponent = {
@@ -63,5 +62,3 @@ export const useLocationUpdater = (
 
   return updateLocationAndFetchRestaurants;
 };
-
-

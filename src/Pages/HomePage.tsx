@@ -1,25 +1,25 @@
+import { useEffect, useState } from "react";
 import {
   GoogleMap,
   useJsApiLoader,
   Libraries,
   MarkerF,
 } from "@react-google-maps/api";
-import { useEffect, useState } from "react";
-import { SearchComponent } from "../components/SearchComponent";
-import { getGeocode, getLatLng } from "use-places-autocomplete";
-import { useLocation } from "react-router-dom";
-import useRestaurants from "../hooks/useGetRestaurants";
-import { DefaultLocation, InfoWindowData, Item } from "../types/Google.types";
-import { Restaurant } from "../types/Restaurant.types";
 import { Button } from "react-bootstrap";
-import { fetchAndGeocodeRestaurants } from "../hooks/useUpdateGeorestaurants";
+import { useLocation, useNavigate } from "react-router-dom";
+import { getGeocode, getLatLng } from "use-places-autocomplete";
+import { SearchComponent } from "../components/SearchComponent";
 import { getCurrentPosition } from "../components/GetMyLocation";
-
 import { FilteredRestaurants } from "../components/FilterRestaurants";
 import { MarkersComponent } from "../components/MarkersComponent";
 import { RenderRestaurantsList } from "../components/RenderRestaurantList";
+import useRestaurants from "../hooks/useGetRestaurants";
 import useDirections from "../hooks/useDirection";
 import { useLocationUpdater } from "../hooks/useLocationUpdater";
+import { useFetchAndGeocodeRestaurants } from "../hooks/useUpdateGeorestaurants";
+import { DefaultLocation, InfoWindowData, Item } from "../types/Google.types";
+import { Restaurant } from "../types/Restaurant.types";
+import { useSelectedValues } from "../contexts/SelectedValuesContext";
 
 const DEFAULT_LOCATION: DefaultLocation = {
   lat: 55.604981,
@@ -38,6 +38,7 @@ const Map = () => {
     city: String(searchParams.get("city")) || DEFAULT_LOCATION.city,
   };
   const URLLocation = useLocation();
+  const navigate = useNavigate();
   const [location, setLocation] = useState<DefaultLocation>({
     lat: initialParams.lat,
     lng: initialParams.lng,
@@ -49,10 +50,15 @@ const Map = () => {
   const [infoWindowData, setInfoWindowData] = useState<InfoWindowData | null>(
     null
   );
+  const { selectedCategory, selectedUtbud } = useSelectedValues();
+
+  const [validFilteredRestaurants, setValidFilteredRestaurants] = useState<
+    Restaurant[]
+  >([]);
   const [selectedCity, setSelectedCity] = useState<string>(initialParams.city);
   const [zoom, setZoom] = useState(defaultZoom);
   const { data: restaurants } = useRestaurants();
-  const validRestaurants = FilteredRestaurants(restaurants || [], selectedCity);
+  const fetchAndGeocode = useFetchAndGeocodeRestaurants();
   const { isLoaded, loadError } = useJsApiLoader({
     googleMapsApiKey: import.meta.env.VITE_FIREBASE_GOOGLE_API_KEY,
     libraries: libraries,
@@ -71,9 +77,8 @@ const Map = () => {
 
   const updateLocationAndFetchRestaurants = useLocationUpdater(
     restaurants || [],
-    fetchAndGeocodeRestaurants
+    fetchAndGeocode
   );
-
   const handleOnSelect = async (item: Item) => {
     const results = await getGeocode({ address: item.name });
     const { lat, lng } = await getLatLng(results[0]);
@@ -108,14 +113,41 @@ const Map = () => {
       console.error("Error getting user position:", error);
     }
   };
-
-  useEffect(() => {
+  const initializePage = () => {
     if (!initialParams.lat || !initialParams.lng) {
       const newURL = `${window.location.origin}${window.location.pathname}?lat=${DEFAULT_LOCATION.lat}&lng=${DEFAULT_LOCATION.lng}&city=${DEFAULT_LOCATION.city}`;
       window.history.pushState({}, "", newURL);
       setZoom(defaultZoom);
     }
-  }, [initialParams.lat, initialParams.lng]);
+  };
+  const handleOnMapLoad = (map: google.maps.Map) => {
+    if (directionsRenderer) {
+      directionsRenderer.setMap(map);
+    }
+  };
+
+  useEffect(() => {
+    const updatedValidRestaurants = FilteredRestaurants(
+      restaurants || [],
+      selectedCity,
+      selectedCategory,
+      selectedUtbud
+    ).filter(
+      (restaurant) =>
+        restaurant.Utbud === selectedUtbud &&
+        restaurant.Kategori === selectedCategory
+    );
+
+    setValidFilteredRestaurants(updatedValidRestaurants);
+    console.log("useEffect", validFilteredRestaurants);
+  }, [restaurants, selectedCity, selectedCategory, selectedUtbud]);
+
+  useEffect(initializePage, [initialParams.lat, initialParams.lng]);
+
+  useEffect(() => {
+    const updatedPath = `${URLLocation.pathname}?lat=${location.lat}&lng=${location.lng}&city=${location.city}&category=${selectedCategory}&utbud=${selectedUtbud}`;
+    navigate(updatedPath, { replace: true });
+  }, [selectedCategory, selectedUtbud]);
 
   if (!isLoaded)
     return (
@@ -137,26 +169,23 @@ const Map = () => {
         zoom={zoom}
         center={location}
         mapContainerClassName="map-container"
-        onLoad={(map) => {
-          if (directionsRenderer) {
-            directionsRenderer.setMap(map);
-          }
-        }}
+        onLoad={handleOnMapLoad}
       >
         <MarkersComponent
-          validRestaurants={validRestaurants}
+          validRestaurants={validFilteredRestaurants}
           handleMarkerClick={handleMarkerClick}
           handleInfoWindowClose={() => setIsOpen(false)}
           isOpen={isOpen}
           infoWindowData={infoWindowData}
         />
         {myPosition && <MarkerF position={myPosition} label="Me" />}
-        <SearchComponent handleOnSelect={handleOnSelect} />
+        <div className="inline-container">
+          <SearchComponent handleOnSelect={handleOnSelect} />
+        </div>
       </GoogleMap>
       <Button variant="secondary" onClick={handleDefaultClick}>
         Go back to default
       </Button>
-
       <Button
         onClick={() => {
           getCurrentPosition()
@@ -174,7 +203,8 @@ const Map = () => {
       >
         Get my position
       </Button>
-      <RenderRestaurantsList validRestaurants={validRestaurants} />
+
+      <RenderRestaurantsList validRestaurants={validFilteredRestaurants} />
     </>
   );
 };

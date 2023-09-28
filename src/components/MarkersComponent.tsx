@@ -18,22 +18,25 @@ export const MarkersComponent: React.FC<Iprops> = ({
 }) => {
   return (
     <>
-      {validRestaurants.map((restaurant: Restaurant) => (
-        <MarkerF
-          key={restaurant._id}
-          position={{
-            lat: restaurant.Latitude!,
-            lng: restaurant.Longitude!,
-          }}
-          onClick={() => handleMarkerClick(restaurant)}
-        >
-          {isOpen && infoWindowData?.id === restaurant._id && (
-            <InfoWindow onCloseClick={handleInfoWindowClose}>
-              <h3>{infoWindowData.Namn}</h3>
-            </InfoWindow>
-          )}
-        </MarkerF>
-      ))}
+      {validRestaurants.map((restaurant: Restaurant) => {
+        console.log("inside markescoponent", restaurant);
+        return (
+          <MarkerF
+            key={restaurant._id}
+            position={{
+              lat: restaurant.Latitude!,
+              lng: restaurant.Longitude!,
+            }}
+            onClick={() => handleMarkerClick(restaurant)}
+          >
+            {isOpen && infoWindowData?.id === restaurant._id && (
+              <InfoWindow onCloseClick={handleInfoWindowClose}>
+                <h3>{infoWindowData.Namn}</h3>
+              </InfoWindow>
+            )}
+          </MarkerF>
+        );
+      })}
     </>
   );
 };
