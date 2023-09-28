@@ -35,7 +35,7 @@ const Map = () => {
   const initialParams = {
     lat: Number(searchParams.get("lat")) || DEFAULT_LOCATION.lat,
     lng: Number(searchParams.get("lng")) || DEFAULT_LOCATION.lng,
-    city: String(searchParams.get("city")) || DEFAULT_LOCATION.city,
+    city: String(searchParams.get("stad")) || DEFAULT_LOCATION.city,
   };
   const URLLocation = useLocation();
   const navigate = useNavigate();
@@ -68,7 +68,7 @@ const Map = () => {
     const searchParams = new URLSearchParams(URLLocation.search);
     const lat = Number(searchParams.get("lat")) || DEFAULT_LOCATION.lat;
     const lng = Number(searchParams.get("lng")) || DEFAULT_LOCATION.lng;
-    const city = String(searchParams.get("city")) || DEFAULT_LOCATION.city;
+    const city = String(searchParams.get("stad")) || DEFAULT_LOCATION.city;
 
     setLocation({ lat, lng, city });
     setSelectedCity(city);
@@ -84,7 +84,7 @@ const Map = () => {
     await fetchAndGeocode(updatedLocation.city);
   };
   const handleDefaultClick = () => {
-    const defaultURL = `${window.location.origin}${window.location.pathname}?lat=${DEFAULT_LOCATION.lat}&lng=${DEFAULT_LOCATION.lng}&city=${DEFAULT_LOCATION.city}`;
+    const defaultURL = `${window.location.origin}${window.location.pathname}?lat=${DEFAULT_LOCATION.lat}&lng=${DEFAULT_LOCATION.lng}&stad=${DEFAULT_LOCATION.city}`;
     window.location.href = defaultURL;
   };
   const handleMarkerClick = async (restaurant: Restaurant) => {
@@ -112,7 +112,7 @@ const Map = () => {
   };
   const initializePage = () => {
     if (!initialParams.lat || !initialParams.lng) {
-      const newURL = `${window.location.origin}${window.location.pathname}?lat=${DEFAULT_LOCATION.lat}&lng=${DEFAULT_LOCATION.lng}&city=${DEFAULT_LOCATION.city}`;
+      const newURL = `${window.location.origin}${window.location.pathname}?lat=${DEFAULT_LOCATION.lat}&lng=${DEFAULT_LOCATION.lng}&stad=${DEFAULT_LOCATION.city}`;
       window.history.pushState({}, "", newURL);
       setZoom(defaultZoom);
     }
@@ -132,14 +132,14 @@ const Map = () => {
       selectedUtbud
     );
     setValidFilteredRestaurants(updatedValidRestaurants);
-    console.log("useEffect", updatedValidRestaurants);
   }, [restaurants, selectedCity, selectedCategory, selectedUtbud]);
 
   useEffect(initializePage, [initialParams.lat, initialParams.lng]);
 
   useEffect(() => {
-    const updatedPath = `${URLLocation.pathname}?lat=${location.lat}&lng=${location.lng}&city=${location.city}&category=${selectedCategory}&utbud=${selectedUtbud}`;
+    const updatedPath = `${URLLocation.pathname}?lat=${location.lat}&lng=${location.lng}&stad=${location.city}&category=${selectedCategory}&utbud=${selectedUtbud}`;
     navigate(updatedPath, { replace: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedCategory, selectedUtbud]);
 
   if (!isLoaded)
@@ -177,7 +177,7 @@ const Map = () => {
         </div>
       </GoogleMap>
       <Button variant="secondary" onClick={handleDefaultClick}>
-        Go back to default
+        Defaultläge
       </Button>
       <Button
         onClick={() => {
@@ -194,7 +194,7 @@ const Map = () => {
             .catch((error) => alert(error.message));
         }}
       >
-        Get my position
+        Hämta min position
       </Button>
 
       <RenderRestaurantsList validRestaurants={validFilteredRestaurants} />

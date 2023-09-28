@@ -24,23 +24,17 @@ const LoginPage = () => {
   const navigate = useNavigate();
 
   const onLogin: SubmitHandler<LoginCredentials> = async (data) => {
-    // Clear any previous error state
     setErrorMessage(null);
 
-    // Try to log in the user with the provided credentials
     try {
       setLoading(true);
       await login(data.email, data.password);
-
-      // If successful, redirect to the home page
       navigate("/restaurants");
     } catch (error) {
       if (error instanceof FirebaseError) {
         setErrorMessage(error.message);
       } else {
-        setErrorMessage(
-          "Something went wrong. Have you tried turning it off and on again?"
-        );
+        setErrorMessage("Något blev fel vid inloggning");
       }
       setLoading(false);
     }
@@ -84,15 +78,15 @@ const LoginPage = () => {
                     })}
                   />
                   {errors.password && (
-                    <p className="invalid">
-                      {errors.password.message ?? "Invalid value"}
+                    <p className="ogiltig">
+                      {errors.password.message ?? "ogiltigt värde"}
                     </p>
                   )}
                   <Form.Text>At least 6 characters</Form.Text>
                 </Form.Group>
 
                 <Button disabled={loading} variant="primary" type="submit">
-                  {loading ? "Logging in..." : "Logga In"}
+                  {loading ? "Loggar in..." : "Logga In"}
                 </Button>
               </Form>
             </Card.Body>

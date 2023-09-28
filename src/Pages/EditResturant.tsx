@@ -10,9 +10,7 @@ import { RestaurantFormData } from "../types/Restaurant.types";
 const EditRestaurant = () => {
   const navigate = useNavigate();
   const { id } = useParams();
-
   const documentId = id as string;
-
   const { data, loading } = useRestaurant(documentId);
 
   if (loading || !data) {
@@ -20,18 +18,15 @@ const EditRestaurant = () => {
   }
 
   const updateRestaurant = async (data: RestaurantFormData) => {
-    // Get a reference to the document
     const docRef = doc(restuantCol, documentId);
-
-    // Set the contents of the document
     toast.promise(
       updateDoc(docRef, {
         ...data,
       }),
       {
-        pending: " Saving changes..",
-        success: " Restaurant is saved successfully",
-        error: "Something went wrong while saving the changes",
+        pending: "Sparar",
+        success: "Sparat",
+        error: "Något gick fel",
       }
     );
     navigate("/restaurants");
@@ -41,8 +36,6 @@ const EditRestaurant = () => {
     const docRef = doc(restuantCol, documentId);
 
     await deleteDoc(docRef);
-
-    toast.success("deleted!");
 
     navigate("/restaurants", {
       replace: true,
@@ -56,11 +49,11 @@ const EditRestaurant = () => {
       <RestaurantForm onSave={updateRestaurant} initialValues={data} />
 
       <Button variant="warning" onClick={() => deleteRestaurant()}>
-        Delete
+        Radera
       </Button>
 
       <Button variant="secondary" onClick={() => navigate(-1)}>
-        &laquo; Go back
+        &laquo; Gå tillbaka
       </Button>
     </>
   );

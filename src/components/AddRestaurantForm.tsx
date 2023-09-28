@@ -36,7 +36,7 @@ const AddRestaurantForm: React.FC<IProps> = ({ onAddRestaurant }) => {
           type="text"
           {...register("Namn", { required: "obligatosikt" })}
         />
-        {errors.Namn && <p className="invalid">{errors.Namn.message}</p>}
+        {errors.Namn && <p className="ogiltig">{errors.Namn.message}</p>}
       </Form.Group>
 
       <Form.Group>
@@ -44,11 +44,11 @@ const AddRestaurantForm: React.FC<IProps> = ({ onAddRestaurant }) => {
         <Form.Control
           type="text"
           {...register("Gatuadress", {
-            required: "Gatuadress är obligatoriskt",
+            required: "Obligatoriskt",
           })}
         />
         {errors.Gatuadress && (
-          <p className="invalid">{errors.Gatuadress.message}</p>
+          <p className="ogiltig">{errors.Gatuadress.message}</p>
         )}
       </Form.Group>
 
@@ -58,9 +58,7 @@ const AddRestaurantForm: React.FC<IProps> = ({ onAddRestaurant }) => {
           type="text"
           {...register("Ort", { required: "obligatosikt" })}
         />
-        {errors.Gatuadress && (
-          <p className="invalid">{errors.Gatuadress.message}</p>
-        )}
+        {errors.Ort && <p className="ogiltig">{errors.Ort.message}</p>}
       </Form.Group>
 
       <Form.Group>
@@ -69,8 +67,8 @@ const AddRestaurantForm: React.FC<IProps> = ({ onAddRestaurant }) => {
           type="text"
           {...register("Beskrivning", { required: "obligatosikt" })}
         />
-        {errors.Gatuadress && (
-          <p className="invalid">{errors.Gatuadress.message}</p>
+        {errors.Beskrivning && (
+          <p className="ogiltig">{errors.Beskrivning.message}</p>
         )}
       </Form.Group>
 
@@ -81,7 +79,7 @@ const AddRestaurantForm: React.FC<IProps> = ({ onAddRestaurant }) => {
           {...register("Latitude", { required: "obligatosikt" })}
         />
         {errors.Latitude && (
-          <p className="invalid">{errors.Latitude.message}</p>
+          <p className="ogiltig">{errors.Latitude.message}</p>
         )}
       </Form.Group>
 
@@ -92,7 +90,7 @@ const AddRestaurantForm: React.FC<IProps> = ({ onAddRestaurant }) => {
           {...register("Longitude", { required: "obligatosikt" })}
         />
         {errors.Longitude && (
-          <p className="invalid">{errors.Longitude.message}</p>
+          <p className="ogiltig">{errors.Longitude.message}</p>
         )}
       </Form.Group>
 
@@ -102,8 +100,8 @@ const AddRestaurantForm: React.FC<IProps> = ({ onAddRestaurant }) => {
           type="text"
           {...register("Kategori", { required: "obligatosikt" })}
         />
-        {errors.Gatuadress && (
-          <p className="invalid">{errors.Gatuadress.message}</p>
+        {errors.Kategori && (
+          <p className="ogiltig">{errors.Kategori.message}</p>
         )}
       </Form.Group>
 
@@ -113,9 +111,7 @@ const AddRestaurantForm: React.FC<IProps> = ({ onAddRestaurant }) => {
           type="text"
           {...register("Utbud", { required: "obligatosikt" })}
         />
-        {errors.Gatuadress && (
-          <p className="invalid">{errors.Gatuadress.message}</p>
-        )}
+        {errors.Utbud && <p className="ogiltig">{errors.Utbud.message}</p>}
       </Form.Group>
 
       <Form.Group>
@@ -125,7 +121,7 @@ const AddRestaurantForm: React.FC<IProps> = ({ onAddRestaurant }) => {
 
       <Form.Group>
         <Form.Label>Telefon</Form.Label>
-        <Form.Control type="tel" {...register("tel")} />
+        <Form.Control type="nummer" {...register("tel")} />
       </Form.Group>
 
       <Form.Group>

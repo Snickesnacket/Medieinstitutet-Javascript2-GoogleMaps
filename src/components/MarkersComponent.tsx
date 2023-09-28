@@ -19,7 +19,6 @@ export const MarkersComponent: React.FC<Iprops> = ({
   return (
     <>
       {validRestaurants.map((restaurant: Restaurant) => {
-        console.log("inside markescoponent", restaurant);
         return (
           <MarkerF
             key={restaurant._id}

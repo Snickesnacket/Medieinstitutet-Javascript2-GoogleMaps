@@ -37,7 +37,7 @@ const RestaurantForm: React.FC<IProps> = ({ onSave, initialValues }) => {
         <Form.Label>Namn</Form.Label>
         <Form.Control
           type="text"
-          {...register("Namn", { required: "Namn is required" })}
+          {...register("Namn", { required: "obligatorisk" })}
         />
         {errors.Namn && <p className="invalid">{errors.Namn.message}</p>}
       </Form.Group>
@@ -46,7 +46,7 @@ const RestaurantForm: React.FC<IProps> = ({ onSave, initialValues }) => {
         <Form.Label>Gatuadress</Form.Label>
         <Form.Control
           type="text"
-          {...register("Gatuadress", { required: "Gatuadress is required" })}
+          {...register("Gatuadress", { required: "obligatorisk" })}
         />
         {errors.Gatuadress && (
           <p className="invalid">{errors.Gatuadress.message}</p>

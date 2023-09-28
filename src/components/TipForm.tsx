@@ -37,7 +37,7 @@ const TipForm: React.FC<IProps> = ({ onSave, initialValues }) => {
           type="email"
           {...register("email", { required: "Email" })}
         />
-        {errors.email && <p className="invalid">{errors.email.message}</p>}
+        {errors.email && <p className="ogiltig">{errors.email.message}</p>}
       </Form.Group>
 
       <Form.Group>

@@ -28,7 +28,7 @@ export const useDirections = (isLoaded: boolean) => {
       if (status === google.maps.DirectionsStatus.OK) {
         directionsRenderer.setDirections(result);
       } else {
-        console.error("Directions request failed due to " + status);
+        alert("Sorry it was not possible to find the route");
       }
     });
   };

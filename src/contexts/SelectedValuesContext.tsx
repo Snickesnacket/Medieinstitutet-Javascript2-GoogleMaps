@@ -2,10 +2,11 @@ import React, { createContext, useContext, useState } from "react";
 
 interface SelectedValuesContextType {
   selectedCategory: string;
-  setSelectedCategory: (category: string) => void;
+  setSelectedCategory: React.Dispatch<React.SetStateAction<string>>;
   selectedUtbud: string;
-  setSelectedUtbud: (utbud: string) => void;
+  setSelectedUtbud: React.Dispatch<React.SetStateAction<string>>;
 }
+
 const defaultValues: SelectedValuesContextType = {
   selectedCategory: "",
   setSelectedCategory: () => {},
@@ -20,6 +21,7 @@ type SelectedValueContextProps = {
 export const SelectedValuesContext =
   createContext<SelectedValuesContextType>(defaultValues);
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useSelectedValues = () => useContext(SelectedValuesContext);
 
 export const SelectedValuesProvider: React.FC<SelectedValueContextProps> = ({
