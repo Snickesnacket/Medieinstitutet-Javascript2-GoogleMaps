@@ -14,11 +14,12 @@ import { Restaurant } from "../types/Restaurant.types";
 import { Button } from "react-bootstrap";
 import { fetchAndGeocodeRestaurants } from "../hooks/useUpdateGeorestaurants";
 import { getCurrentPosition } from "../components/GetMyLocation";
-import useLocationUpdater from "../hooks/useLocationUpdater";
+
 import { FilteredRestaurants } from "../components/FilterRestaurants";
-import { MarkersComponent } from "../components/markers";
+import { MarkersComponent } from "../components/MarkersComponent";
 import { RenderRestaurantsList } from "../components/RenderRestaurantList";
 import useDirections from "../hooks/useDirection";
+import { useLocationUpdater } from "../hooks/useLocationUpdater";
 
 const DEFAULT_LOCATION: DefaultLocation = {
   lat: 55.604981,

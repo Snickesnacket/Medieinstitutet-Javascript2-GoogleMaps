@@ -19,8 +19,8 @@ export interface RestaurantFormData {
   Namn: string;
   Gatuadress: string;
   Ort: string;
-  Latitude: number;
-  Longitude: number;
+  Latitude?: number;
+  Longitude?: number;
   Beskrivning: string;
   Kategori: string;
   Utbud: string;
