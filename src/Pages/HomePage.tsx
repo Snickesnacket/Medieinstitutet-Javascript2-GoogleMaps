@@ -10,7 +10,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { getGeocode, getLatLng } from "use-places-autocomplete";
 import { SearchComponent } from "../components/SearchComponent";
 import { getCurrentPosition } from "../components/GetMyLocation";
-import { FilteredRestaurants } from "../components/FilterRestaurants";
+import { getFilteredRestaurants } from "../components/FilterRestaurants";
 import { MarkersComponent } from "../components/MarkersComponent";
 import { RenderRestaurantsList } from "../components/RenderRestaurantList";
 import useRestaurants from "../hooks/useGetRestaurants";
@@ -51,7 +51,6 @@ const Map = () => {
     null
   );
   const { selectedCategory, selectedUtbud } = useSelectedValues();
-
   const [validFilteredRestaurants, setValidFilteredRestaurants] = useState<
     Restaurant[]
   >([]);
@@ -75,16 +74,14 @@ const Map = () => {
     setSelectedCity(city);
   }, [URLLocation.search]);
 
-  const updateLocationAndFetchRestaurants = useLocationUpdater(
-    restaurants || [],
-    fetchAndGeocode
-  );
+  const updateLocationAndFetchRestaurants = useLocationUpdater(fetchAndGeocode);
   const handleOnSelect = async (item: Item) => {
     const results = await getGeocode({ address: item.name });
     const { lat, lng } = await getLatLng(results[0]);
     const updatedLocation = await updateLocationAndFetchRestaurants(lat, lng);
     setLocation(updatedLocation);
     setSelectedCity(updatedLocation.city);
+    await fetchAndGeocode(updatedLocation.city);
   };
   const handleDefaultClick = () => {
     const defaultURL = `${window.location.origin}${window.location.pathname}?lat=${DEFAULT_LOCATION.lat}&lng=${DEFAULT_LOCATION.lng}&city=${DEFAULT_LOCATION.city}`;
@@ -120,6 +117,7 @@ const Map = () => {
       setZoom(defaultZoom);
     }
   };
+
   const handleOnMapLoad = (map: google.maps.Map) => {
     if (directionsRenderer) {
       directionsRenderer.setMap(map);
@@ -127,19 +125,14 @@ const Map = () => {
   };
 
   useEffect(() => {
-    const updatedValidRestaurants = FilteredRestaurants(
+    const updatedValidRestaurants = getFilteredRestaurants(
       restaurants || [],
       selectedCity,
       selectedCategory,
       selectedUtbud
-    ).filter(
-      (restaurant) =>
-        restaurant.Utbud === selectedUtbud &&
-        restaurant.Kategori === selectedCategory
     );
-
     setValidFilteredRestaurants(updatedValidRestaurants);
-    console.log("useEffect", validFilteredRestaurants);
+    console.log("useEffect", updatedValidRestaurants);
   }, [restaurants, selectedCity, selectedCategory, selectedUtbud]);
 
   useEffect(initializePage, [initialParams.lat, initialParams.lng]);

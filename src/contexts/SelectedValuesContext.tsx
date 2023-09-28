@@ -2,11 +2,10 @@ import React, { createContext, useContext, useState } from "react";
 
 interface SelectedValuesContextType {
   selectedCategory: string;
-  setSelectedCategory: React.Dispatch<React.SetStateAction<string>>;
+  setSelectedCategory: (category: string) => void;
   selectedUtbud: string;
-  setSelectedUtbud: React.Dispatch<React.SetStateAction<string>>;
+  setSelectedUtbud: (utbud: string) => void;
 }
-
 const defaultValues: SelectedValuesContextType = {
   selectedCategory: "",
   setSelectedCategory: () => {},

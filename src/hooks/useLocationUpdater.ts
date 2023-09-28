@@ -11,11 +11,7 @@ type GeocodeResult = {
 };
 
 export const useLocationUpdater = (
-  restaurants: Restaurant[],
-  fetchAndGeocodeRestaurants: (
-    city: string,
-    restaurants: Restaurant[]
-  ) => Promise<void>
+  fetchAndGeocodeRestaurants: (city: string) => Promise<Restaurant[]>
 ): ((
   lat: number,
   lng: number
@@ -53,9 +49,7 @@ export const useLocationUpdater = (
     const newURL = `${window.location.origin}${window.location.pathname}?lat=${lat}&lng=${lng}&city=${cityName}`;
     window.history.pushState({}, "", newURL);
 
-    if (restaurants) {
-      await fetchAndGeocodeRestaurants(cityName, restaurants);
-    }
+    await fetchAndGeocodeRestaurants(cityName);
 
     return { lat, lng, city: cityName };
   };
