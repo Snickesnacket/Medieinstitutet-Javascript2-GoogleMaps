@@ -8,6 +8,7 @@ import {
 } from "firebase/firestore";
 import { NewRestaurant, Restaurant } from "../types/Restaurant.types";
 import { NewTip, Tip } from "../types/Tips.types";
+import { AdminData } from "../types/Admin.types";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -30,5 +31,6 @@ const createCollection = <T = DocumentData>(collectionName: string) => {
 export const restuantCol = createCollection<Restaurant>("restaurants");
 export const newRestaurantCol = createCollection<NewRestaurant>("restaurants");
 export const tipsCol = createCollection<Tip>("Tips");
+export const adminCol = createCollection<AdminData>("Admin");
 export const newTipCol = createCollection<NewTip>("Tips");
 export default app;

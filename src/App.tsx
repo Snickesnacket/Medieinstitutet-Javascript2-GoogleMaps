@@ -10,6 +10,8 @@ import LoggaInPage from "./Pages/LoggaInPage";
 import LoggaUtPage from "./Pages/LoggaUtPage";
 import TipsPageAdmin from "./Pages/TipsPageAdmin";
 import { CreateTip } from "./Pages/CreateTip";
+import UpdateProfile from "./Pages/UpdateProfile";
+import AllAdmin from "./Pages/AllAdmin";
 
 function App() {
   return (
@@ -18,6 +20,8 @@ function App() {
       <Container className="py-3">
         <Routes>
           <Route path="/" element={<HomePage />} />
+          <Route path="/UpdateProfile" element={<UpdateProfile />} />
+          <Route path="/Admins" element={<AllAdmin />} />
           <Route path="/Create" element={<CreateRestaurant />}></Route>
           <Route path="/Tips" element={<TipsPageAdmin />}></Route>
           <Route path="/Restaurants">
@@ -34,4 +38,4 @@ function App() {
 }
 
 export default App;
-``;
+

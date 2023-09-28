@@ -7,11 +7,28 @@ html, body {
   margin: 0;
   padding: 0;
 }
+.inline-container {
+    display: flex;
+    align-items: center;
+    justify-content: start;
 
+    & > *:not(:last-child) {
+        margin-right: 10px; 
+    }
+}
 .Homepage {
   height: 100vh;
 }
 
+.img-square {
+	aspect-ratio: 1;
+	object-fit: cover;
+}
+
+.dropdown-menu {
+    right: 0;
+    left: auto;
+}
 .map-container {
   height: 300px; 
   @media (min-width: 768px) {

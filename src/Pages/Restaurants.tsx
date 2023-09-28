@@ -4,7 +4,6 @@ import { Link } from "react-router-dom";
 
 const Restaurants = () => {
   const { data, loading } = useRestaurants();
-  console.log(data);
 
   return (
     <>
