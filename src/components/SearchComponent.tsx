@@ -13,7 +13,10 @@ type Props = {
 };
 
 export const SearchComponent = ({ handleOnSelect }: Props) => {
-  const { setSelectedCategory, setSelectedUtbud } = useSelectedValues();
+  const {
+    setValdKategori: setSelectedCategory,
+    setValdUtbud: setSelectedUtbud,
+  } = useSelectedValues();
   const {
     suggestions: { data },
     setValue,
@@ -49,11 +52,14 @@ export const SearchComponent = ({ handleOnSelect }: Props) => {
           <Dropdown.Item onClick={() => setSelectedCategory("Restaurang")}>
             Restaurang
           </Dropdown.Item>
-          <Dropdown.Item onClick={() => setSelectedCategory("Snabbtmat")}>
-            Snabbtmat
+          <Dropdown.Item onClick={() => setSelectedCategory("Snabbmat")}>
+            Snabbmat
           </Dropdown.Item>
           <Dropdown.Item onClick={() => setSelectedCategory("Foodtruck")}>
             Foodtruck
+          </Dropdown.Item>
+          <Dropdown.Item onClick={() => setSelectedCategory("")}>
+            Nollställ
           </Dropdown.Item>
         </Dropdown.Menu>
       </Dropdown>
@@ -69,11 +75,14 @@ export const SearchComponent = ({ handleOnSelect }: Props) => {
           <Dropdown.Item onClick={() => setSelectedUtbud("Lunch")}>
             Lunch
           </Dropdown.Item>
-          <Dropdown.Item onClick={() => setSelectedUtbud("After_Work")}>
+          <Dropdown.Item onClick={() => setSelectedUtbud("After Work")}>
             After Work
           </Dropdown.Item>
           <Dropdown.Item onClick={() => setSelectedUtbud("Middag")}>
             Middag
+          </Dropdown.Item>
+          <Dropdown.Item onClick={() => setSelectedUtbud("")}>
+            Nollställ
           </Dropdown.Item>
         </Dropdown.Menu>
       </Dropdown>

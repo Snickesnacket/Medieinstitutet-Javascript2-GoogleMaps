@@ -6,7 +6,8 @@ import { Restaurant } from "../types/Restaurant.types";
 import useRestaurants from "./useGetRestaurants";
 
 export const useFetchAndGeocodeRestaurants = () => {
-  const { selectedCategory, selectedUtbud } = useSelectedValues();
+  const { setValdKategori: selectedCategory, valdUtbud: selectedUtbud } =
+    useSelectedValues();
   const allCityRestaurants = useRestaurants();
 
   const geocodeAndFetch = async (city: string): Promise<Restaurant[]> => {

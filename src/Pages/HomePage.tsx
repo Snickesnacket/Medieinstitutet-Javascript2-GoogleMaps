@@ -50,13 +50,15 @@ const Map = () => {
   const [infoWindowData, setInfoWindowData] = useState<InfoWindowData | null>(
     null
   );
-  const { selectedCategory, selectedUtbud } = useSelectedValues();
+  const { valdKategori: valdKategori, valdUtbud: valdUtbud } =
+    useSelectedValues();
   const [validFilteredRestaurants, setValidFilteredRestaurants] = useState<
     Restaurant[]
   >([]);
   const [selectedCity, setSelectedCity] = useState<string>(initialParams.city);
   const [zoom, setZoom] = useState(defaultZoom);
-  const { data: restaurants } = useRestaurants();
+  const { data: restaurants, loading: isLoadingRestaurants } = useRestaurants();
+
   const fetchAndGeocode = useFetchAndGeocodeRestaurants();
   const { isLoaded, loadError } = useJsApiLoader({
     googleMapsApiKey: import.meta.env.VITE_FIREBASE_GOOGLE_API_KEY,
@@ -123,31 +125,30 @@ const Map = () => {
       directionsRenderer.setMap(map);
     }
   };
-
   useEffect(() => {
     const updatedValidRestaurants = getFilteredRestaurants(
       restaurants || [],
       selectedCity,
-      selectedCategory,
-      selectedUtbud
+      valdKategori,
+      valdUtbud
     );
     setValidFilteredRestaurants(updatedValidRestaurants);
-  }, [restaurants, selectedCity, selectedCategory, selectedUtbud]);
+  }, [restaurants, selectedCity, valdKategori, valdUtbud]);
 
-  useEffect(initializePage, [initialParams.lat, initialParams.lng]);
+useEffect(initializePage, [initialParams.lat, initialParams.lng]);
 
-  useEffect(() => {
-    const updatedPath = `${URLLocation.pathname}?lat=${location.lat}&lng=${location.lng}&stad=${location.city}&category=${selectedCategory}&utbud=${selectedUtbud}`;
-    navigate(updatedPath, { replace: true });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedCategory, selectedUtbud]);
+useEffect(() => {
+  const updatedPath = `${URLLocation.pathname}?lat=${location.lat}&lng=${location.lng}&stad=${location.city}&kategori=${valdKategori}&utbud=${valdUtbud}`;
+  navigate(updatedPath, { replace: true });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [valdKategori, valdUtbud]);
 
-  if (!isLoaded)
-    return (
-      <div>
-        <p>LOADING....</p>
-      </div>
-    );
+if (!isLoaded || isLoadingRestaurants)
+  return (
+    <div>
+      <p>LOADING....</p>
+    </div>
+  );
 
   if (loadError)
     return (

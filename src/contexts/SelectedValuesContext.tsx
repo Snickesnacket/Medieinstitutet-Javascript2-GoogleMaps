@@ -1,17 +1,17 @@
 import React, { createContext, useContext, useState } from "react";
 
 interface SelectedValuesContextType {
-  selectedCategory: string;
-  setSelectedCategory: React.Dispatch<React.SetStateAction<string>>;
-  selectedUtbud: string;
-  setSelectedUtbud: React.Dispatch<React.SetStateAction<string>>;
+  valdKategori: string;
+  setValdKategori: React.Dispatch<React.SetStateAction<string>>;
+  valdUtbud: string;
+  setValdUtbud: React.Dispatch<React.SetStateAction<string>>;
 }
 
 const defaultValues: SelectedValuesContextType = {
-  selectedCategory: "",
-  setSelectedCategory: () => {},
-  selectedUtbud: "",
-  setSelectedUtbud: () => {},
+  valdKategori: "",
+  setValdKategori: () => {},
+  valdUtbud: "",
+  setValdUtbud: () => {},
 };
 
 type SelectedValueContextProps = {
@@ -27,16 +27,16 @@ export const useSelectedValues = () => useContext(SelectedValuesContext);
 export const SelectedValuesProvider: React.FC<SelectedValueContextProps> = ({
   children,
 }) => {
-  const [selectedCategory, setSelectedCategory] = useState<string>("");
-  const [selectedUtbud, setSelectedUtbud] = useState<string>("");
+  const [valdKategori, setValdKategori] = useState<string>("");
+  const [valdUtbud, setValdUtbud] = useState<string>("");
 
   return (
     <SelectedValuesContext.Provider
       value={{
-        selectedCategory,
-        setSelectedCategory,
-        selectedUtbud,
-        setSelectedUtbud,
+        valdKategori: valdKategori,
+        setValdKategori: setValdKategori,
+        valdUtbud: valdUtbud,
+        setValdUtbud: setValdUtbud,
       }}
     >
       {children}
