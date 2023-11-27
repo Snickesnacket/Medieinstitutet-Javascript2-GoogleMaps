@@ -1,6 +1,6 @@
-## Google Maps 
+# Google Maps 
 
-# Betyg: VG 
+## Betyg: VG 
 
 # React, React Router, Firebase Firestore, Authentication, React Hook Form, Google Maps API, 
 # Beskrivning
