@@ -10,8 +10,8 @@ Samtliga data ska hämtas/skapas/ändras med Firebase. Google Maps ska endast vi
 
 # Hygienkrav
 Nedan hygienkrav ska vara uppfyllda oavsett betygsnivå.
-● Responsiv (mobile first)
-● Versionshanterad 
+ - Responsiv (mobile first)
+ - Versionshanterad 
 
 # Teknisk kravspecifikation
 ● Komponentbaserad
